@@ -14,10 +14,11 @@ ytest = t(test_idx);
 % mean((yndt-ytest).^2)
 
 timet = data_all.time(test_idx);
-startnum = datenum(2015,01,05);
-endnum = datenum(2015,1,13);
+% startnum = datenum(2015,06,07);
+startnum = datenum(2015,08,01);
+endnum = datenum(2015,08,09);
+% endnum = datenum(2015,8,16);
 s = find((timet>=startnum) & (timet<=endnum));
-
 colorOrder = get(gca,'colororder');
 
 figure(1)
@@ -25,7 +26,7 @@ hold on
 plot(timet(s), ytest(s))
 plot(timet(s), yndt(s))
 plot(timet(s), ynn45(s))
-datetick('x',2)
+datetick('x',6)
 legend('target','NDT', 'NN45')
 xlabel('Time')
 ylabel('Plasma Density (log10)')
@@ -37,9 +38,9 @@ hold on
 % plot(ndttr.epoch, sqrt(perf_tree)*ones(size(ndttr.epoch)),'--','Color','#0072BD','LineWidth',2) %default color1
 % plot(ndttr.epoch, sqrt(tperf_tree)*ones(size(ndttr.epoch)),'Color','#0072BD','LineWidth',2)
 plot(ndttr.epoch, sqrt(ndttr.perf),'--','Color','#D95319','LineWidth',2) %default color2
-plot(ndttr.epoch, sqrt(ndttr.tperf),'Color','#D95319','LineWidth',2)
+plot(ndttr.epoch, sqrt(ndttr.tperf),'x-','Color','#D95319','LineWidth',2)
 plot(nn45tr.epoch, sqrt(nn45tr.perf),'--','Color','#EDB120','LineWidth',2) %default color3
-plot(nn45tr.epoch, sqrt(nn45tr.tperf),'Color','#EDB120','LineWidth',2)
+plot(nn45tr.epoch, sqrt(nn45tr.tperf),'o-','Color','#EDB120','LineWidth',2)
 % legend('Tree,train','Tree,test','NDT,train','NDT,test','NN45,train','NN45,test')
 legend('NDT,train','NDT,test','NN45,train','NN45,test')
 xlabel('Epochs')
