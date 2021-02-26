@@ -15,10 +15,9 @@ procFcnsOutput{1} = 'removeconstantrows'; procFcnsOutput{2} = 'mapminmax';
 % MaxNumSplits = 15, 24
 MaxNumSplits = 25;
 
-savedir = 'E:\Google Drive\A-projects\PINE\results';
 bs = 30000;
 
-for k = 2:2
+for k = 3:4
     % initialize NDT
     [W0,b0,W1,b1,W2,b2,tree,error_check,K] = initAllWb(Xp2(:,PINE.inds_train{k})',tp2(:,PINE.inds_train{k})',MaxNumSplits);
 %     view(tree,'Mode','graph')
@@ -51,5 +50,5 @@ for k = 2:2
     [ndt, ndttr] = train(ndt, X, t);
     
     names = sprintf('ndt%d_val_%d.mat', MaxNumSplits, k);
-    save(fullfile(savedir, names), 'ndt', 'ndttr')
+    save(fullfile(savedir2, names), 'ndt', 'ndttr')
 end
