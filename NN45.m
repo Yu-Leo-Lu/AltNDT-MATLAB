@@ -3,7 +3,7 @@ X = PINE.data_all.X'; t = PINE.data_all.t';
 savedir = 'E:\Google Drive\A-projects\PINE\results';
 
 runs = 10;
-for i = 7:runs
+for i = 1:runs
     nn45 = feedforwardnet(45);
     nn45 = configure(nn45,X,t);
     nn45.divideFcn = 'divideind';
@@ -32,15 +32,15 @@ for i = 1:runs
 end
 
 for i = 1:runs
-    nn60 = feedforwardnet(60);
-    nn60 = configure(nn60,X,t);
-    nn60.divideFcn = 'divideind';
-    nn60.divideParam.trainInd = train_idx;
-    nn60.divideParam.testInd = test_idx;
+    nn38 = feedforwardnet(38);
+    nn38 = configure(nn38,X,t);
+    nn38.divideFcn = 'divideind';
+    nn38.divideParam.trainInd = train_idx;
+    nn38.divideParam.testInd = test_idx;
     
     %train
-    nn60.trainParam.epochs = 20;
-    [nn60, nn60tr] = train(nn60,X,t);
-    names = sprintf('nn60_20eps_%d.mat',i);
-    save(fullfile(savedir, names), 'nn60', 'nn60tr')
+    nn38.trainParam.epochs = 20;
+    [nn38, nn38tr] = train(nn38,X,t);
+    names = sprintf('nn38_20eps_%d.mat',i);
+    save(fullfile(savedir, names), 'nn38', 'nn38tr')
 end

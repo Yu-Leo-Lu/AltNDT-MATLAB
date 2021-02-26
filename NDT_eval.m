@@ -1,11 +1,20 @@
+loaddir = 'E:\Google Drive\A-projects\PINE\results';
+load(fullfile(loaddir, 'nn45_40eps.mat'))
+load(fullfile(loaddir, 'ndt_40eps.mat'))
+
+
+
+[ndtAIC, ndtBIC] = infoCrit(ndttr.tperf(end), length(ndttr.trainInd), ...
+    length(getwb(ndt)));
+[nn45AIC, nn45BIC] = infoCrit(nn45tr.tperf(end), length(nn45tr.trainInd), ...
+    length(getwb(nn45)));
+
 File   = 'PINE_train_val_test_dataset_IrinaOptimal.mat';
 load(File); 
 
 [PINE, train_idx, test_idx] = loadPINE();
 X = PINE.data_all.X'; t = PINE.data_all.t';
 
-load('nn45_40eps.mat')
-load('ndt_40eps.mat')
 
 % Evaluation
 ynn45 = nn45(X(:,test_idx));
