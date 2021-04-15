@@ -14,7 +14,7 @@ title('histogram of mlt')
 
 rad = mlt*2*pi/24;
 figure
-polarscatter(l, rad, 1, t)
+polarscatter(rad, l, 1, t)
 colorbar
 pax = gca;
 pax.ThetaDir = 'clockwise';

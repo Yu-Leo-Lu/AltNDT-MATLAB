@@ -1,5 +1,7 @@
 function [P,inds_train, inds_test] = loadPINE()
 
+startup
+
 File   = 'PINE_train_val_test_dataset_IrinaOptimal.mat';
 P = load(File);  
 

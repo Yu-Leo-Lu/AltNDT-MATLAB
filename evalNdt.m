@@ -22,7 +22,7 @@ yndt = ndt(X(:,test_idx));
 ytest = t(test_idx);
 % mean((yndt-ytest).^2)
 
-timet = data_all.time(test_idx);
+timet = PINE.data_all.time(test_idx);
 % startnum = datenum(2015,06,07);
 startnum = datenum(2015,08,01);
 endnum = datenum(2015,08,09);

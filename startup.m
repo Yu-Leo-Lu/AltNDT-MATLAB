@@ -1,14 +1,12 @@
 addpath('framework')
 
-loaddir = 'E:\Google Drive\A-projects\PINE\';
-savedir = 'E:\Google Drive\A-projects\PINE\results';
+% desktop path
+dir = 'E:\Google Drive\A-projects\PINE\';
 
-addpath(fullfile(loaddir,'results'), ...
-    fullfile(loaddir, 'PINE_data'))
+% laptop path
+% dir2 = 'C:\Users\leona\Google Drive\A-projects\PINE\';
 
+addpath(fullfile(dir,'results'), ...
+    fullfile(dir, 'PINE_data'), ...
+    fullfile(dir, 'figures'));
 
-loaddir2 = 'C:\Users\leona\Google Drive\A-projects\PINE\';
-savedir2 = 'C:\Users\leona\Google Drive\A-projects\PINE\results';
-
-addpath(fullfile(loaddir2,'results'), ...
-    fullfile(loaddir2, 'PINE_data'))
