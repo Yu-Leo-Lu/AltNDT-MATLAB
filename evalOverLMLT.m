@@ -83,24 +83,24 @@ XTestGnlRaw = PINE.data_all.X(testIdx,:);
 % prediction in events from 2001
 load(fullfile(dir, 'PINE_data', 'data2001'));
 
-DateStr = '27-Jun-2001'; hrs = 11;
+DateStr = '20-Mar-2001'; hrs = 14;
 days = datenum(DateStr) - datenum(2001,1,1);
 xTryGnl = data2001(days*24+hrs,:);
 xTry = [xTryGnl(1:6),nan,xTryGnl(7:end)];
 
 figure; % by one testing data
 subplot(2,3,2);
-VisualizePredictionPlasmaSphere(ndtPolar.ndt,inputLabels,xTry,12,36,procFcnsInput,settingsXTrain,[], 'in ndtPolar')
+VisualizePredictionPlasmaSphere(ndtPolar.ndt,inputLabels,xTry,12,72,procFcnsInput,settingsXTrain,[], 'in ndtPolar')
 subplot(2,3,5);
-VisualizePredictionPlasmaSphere(nn45Polar.nn45,inputLabels,xTry,12,36,procFcnsInput,settingsXTrain,[], 'in nn45Polar')
+VisualizePredictionPlasmaSphere(nn45Polar.nn45,inputLabels,xTry,12,72,procFcnsInput,settingsXTrain,[], 'in nn45Polar')
 subplot(2,3,1);
-VisualizePredictionPlasmaSphere(ndtModel.ndt,inputLabelsGnl,xTryGnl,12,36,procFcnsInput,settingsXTrainGnl,[],'in General ndt')
+VisualizePredictionPlasmaSphere(ndtModel.ndt,inputLabelsGnl,xTryGnl,12,72,procFcnsInput,settingsXTrainGnl,[],'in General ndt')
 subplot(2,3,4);
-VisualizePredictionPlasmaSphere(nn45Model.nn45,inputLabelsGnl,xTryGnl,12,36,procFcnsInput,settingsXTrainGnl,[],'in General nn45')
+VisualizePredictionPlasmaSphere(nn45Model.nn45,inputLabelsGnl,xTryGnl,12,72,procFcnsInput,settingsXTrainGnl,[],'in General nn45')
 subplot(2,3,3);
-VisualizePredictionPlasmaSphere(ndtStatPolar.ndt,inputLabels,xTry,12,36,procFcnsInput,settingsXTrain,Stat, 'in ndtStatPolar')
+VisualizePredictionPlasmaSphere(ndtStatPolar.ndt,inputLabels,xTry,12,72,procFcnsInput,settingsXTrain,Stat, 'in ndtStatPolar')
 subplot(2,3,6);
-VisualizePredictionPlasmaSphere(nn45StatPolar.nn45,inputLabels,xTry,12,36,procFcnsInput,settingsXTrain,Stat, 'in nn45StatPolar')
+VisualizePredictionPlasmaSphere(nn45StatPolar.nn45,inputLabels,xTry,12,72,procFcnsInput,settingsXTrain,Stat, 'in nn45StatPolar')
 sgtitle([DateStr,' ',num2str(hrs),':00']);
 
 % find idx by kp, X(:,2)

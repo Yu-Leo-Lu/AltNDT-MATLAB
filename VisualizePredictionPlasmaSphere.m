@@ -68,12 +68,12 @@ for iLayer=1:nLayer
             iL = find(statLRange(:,1)<L(iLayer) & statLRange(:,2)>L(iLayer));
             iLMLT = find(statLRange(:,1)<L(iLayer) & statLRange(:,2)>L(iLayer) &...
                 statLonRange(:,1)<MLT(iZone) & statLonRange(:,2)>MLT(iZone));
-            if isempty(iLMLT) || statnData(iLMLT)<=1
-                Density(iZone,iLayer) = yPred*nanmean(statStd(iL)) + nanmean(statMean(iL));
-            else
-                Density(iZone,iLayer) = yPred*statStd(iLMLT) + statMean(iLMLT);
-            end
-
+%             if isempty(iLMLT) || statnData(iLMLT)<=1
+%                 Density(iZone,iLayer) = yPred*nanmean(statStd(iL)) + nanmean(statMean(iL));
+%             else
+%                 Density(iZone,iLayer) = yPred*statStd(iLMLT) + statMean(iLMLT);
+%             end
+            Density(iZone,iLayer) = yPred*nanmean(statStd(iL)) + nanmean(statMean(iL));
         else
             Density(iZone,iLayer) = yPred;
         end
@@ -126,14 +126,42 @@ caxis([0,4]);
 h=colorbar;
 myMap = jet;
 
-% update blue to white at the end of color bar
-b2w = 31;
-% update blue
-myMap(1:b2w, 3) = linspace(1,myMap(b2w+1,3) ,b2w);
-% update green
-myMap(1:b2w, 1) = linspace(1,0,b2w);
-% update red
-myMap(1:b2w, 2) = linspace(1,0,b2w);
+% readjust scales of jet map:
+myMap((256-32*2):256, 1) = linspace(1,0.75,32*2+1);
+myMap((256-32*2):256, 2) = 0;
+myMap((256-32*2):256, 3) = 0;
+
+myMap((256-32*3):(256-32*2), 1) = 1;
+myMap((256-32*3):(256-32*2), 2) = linspace(0.5,0,32*1+1);
+
+myMap((256-32*5):(256-32*3), 1) = 1;
+myMap((256-32*5):(256-32*3), 2) = linspace(1,0.5,32*2+1);
+myMap((256-32*5):(256-32*3), 3) = 0;
+
+myMap((256-32*6):(256-32*5), 1) = linspace(0,1,32*1+1);
+myMap((256-32*6):(256-32*5), 2) = 1;
+myMap((256-32*6):(256-32*5), 3) = linspace(1,0,32*1+1);
+
+myMap((256-32*7-16):(256-32*6), 1) = 0;
+myMap((256-32*7-16):(256-32*6), 2) = linspace(0,1,32*1+1+16);
+myMap((256-32*7-16):(256-32*6), 3) = 1;
+
+myMap(9:16, 1) = linspace(1,0,8);
+myMap(9:16, 2) = linspace(1,0,8);
+myMap(9:16, 3) = 1;
+
+myMap(1:8, 1) = 1;
+myMap(1:8, 2) = 1;
+myMap(1:8, 3) = 1;
+
+% % update blue to white at the end of color bar
+% b2w = 31;
+% % update blue
+% myMap(1:b2w, 3) = linspace(1,myMap(b2w+1,3) ,b2w);
+% % update green
+% myMap(1:b2w, 1) = linspace(1,0,b2w);
+% % update red
+% myMap(1:b2w, 2) = linspace(1,0,b2w);
 
 % update yellow to cyan transition
 % 160 row is yellow 1,1,0
@@ -143,6 +171,7 @@ myMap(1:b2w, 2) = linspace(1,0,b2w);
 % update the last quater of 16 grey rows to black
 % myMap(160-16:159, :) = 0.5;
 % myMap(160-8:160-4, :) = 0;
+
 colormap(myMap);
 ylabel(h,'Log(density)');
 axis off
