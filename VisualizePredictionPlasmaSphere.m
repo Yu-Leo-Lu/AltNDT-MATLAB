@@ -1,4 +1,4 @@
-function VisualizePredictionPlasmaSphere(NeuralNet,ParameterLabels,EnvironParam,nLayer,nZone,procFcnsInput,settingsXTrain,Stat,nameStr)
+function VisualizePredictionPlasmaSphere(NeuralNet,ParameterLabels,EnvironParam,nLayer,nZone,procFcnsInput,settingsXTrain,Stat,nameStr,Transition)
 %
 % Description: Generate a 2D polar plot of electron density in the
 %      plasmasphere predicted by a neural network.
@@ -45,7 +45,7 @@ for iLayer=1:nLayer
                 case 'l'
                     NNParam(k)=L(iLayer);
                 case 'mlt'
-                    % convert MLT from degree 0-360 to time 0-24
+                    % why /15? convert MLT from degree 0-360 to time 0-24
                     NNParam(k)=MLT(iZone)/15;
                 case 'smlt'
                     NNParam(k)=sin(MLT(iZone)*pi/180);
@@ -56,18 +56,27 @@ for iLayer=1:nLayer
             end
         end
         NNParam = preProcessApply(NNParam, procFcnsInput, settingsXTrain);
-        yPred=predict(NeuralNet,NNParam);
+        
+        try
+            % by SGD
+            yPred=predict(NeuralNet,NNParam);
+        catch
+            % by LM
+            yPred = NeuralNet(NNParam');
+        end
+            
+
         
         % if the model is Stat scaled:
         if ~isempty(Stat)
             statMean = [Stat.DensityMean];
             statStd = [Stat.DensitySTD];
-            statnData = [Stat.nDataPoint];
+%             statnData = [Stat.nDataPoint];
             statLRange = [Stat.LRange]';
-            statLonRange = [Stat.LonRange]';
+%             statLonRange = [Stat.LonRange]';
             iL = find(statLRange(:,1)<L(iLayer) & statLRange(:,2)>L(iLayer));
-            iLMLT = find(statLRange(:,1)<L(iLayer) & statLRange(:,2)>L(iLayer) &...
-                statLonRange(:,1)<MLT(iZone) & statLonRange(:,2)>MLT(iZone));
+%             iLMLT = find(statLRange(:,1)<L(iLayer) & statLRange(:,2)>L(iLayer) &...
+%                 statLonRange(:,1)<MLT(iZone) & statLonRange(:,2)>MLT(iZone));
 %             if isempty(iLMLT) || statnData(iLMLT)<=1
 %                 Density(iZone,iLayer) = yPred*nanmean(statStd(iL)) + nanmean(statMean(iL));
 %             else
@@ -93,10 +102,10 @@ Faces(:,:,3)=[2:nZone,1]'*ones(1,nLayer)+ones(nZone,1)*[1:nLayer]*nZone;
 Faces(:,:,4)=[2:nZone,1]'*ones(1,nLayer)+ones(nZone,1)*[0:nLayer-1]*nZone;
 Faces(:,:,5)=[1:nZone]'*ones(1,nLayer)+ones(nZone,1)*[0:nLayer-1]*nZone;
 Faces=reshape(Faces,nZone*nLayer,5);
-Density=reshape(Density,nZone*nLayer,1);
+DensityVector=reshape(Density,nZone*nLayer,1);
 %
 % figure;
-patch('Faces',Faces,'Vertices',Vertices,'FaceVertexCData',Density,...
+patch('Faces',Faces,'Vertices',Vertices,'FaceVertexCData',DensityVector,...
     'EdgeColor','none','FaceColor','flat');
 %
 % Plot logitude and altitude lines and the globe.
@@ -175,6 +184,22 @@ myMap(1:8, 3) = 1;
 colormap(myMap);
 ylabel(h,'Log(density)');
 axis off
+
+if ~isempty(Transition)
+    indTrans=nLayer*ones(nZone,1);
+    for iZone=1:nZone
+        ind=find(Density(iZone,:)>Transition);
+        if isempty(ind)
+            indTrans(iZone)=1;
+        end
+        indTrans(iZone)=ind(end);
+    end
+    x=cos(2*pi*[0:nZone-1]/nZone).*(1+5*indTrans'/nLayer);
+    y=sin(2*pi*[0:nZone-1]/nZone).*(1+5*indTrans'/nLayer);
+    
+    plot([x,x(1)],[y,y(1)],'k','LineWidth',[2])
+end
+
 title(['Predicted Plasma Density Data ', nameStr]);
 return
 end

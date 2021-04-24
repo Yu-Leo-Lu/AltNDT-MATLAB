@@ -15,21 +15,35 @@ procFcnsOutput{1} = 'removeconstantrows';
 % procFcnsOutput{2} = 'mapminmax';
 
 [XTrain, settingsXTrain] = preProcess(X(trainIdx, :), procFcnsInput);
-[yTrain, settingst] = preProcess(t(trainIdx, :), procFcnsOutput);
+% [yTrain, settingst] = preProcess(t(trainIdx, :), procFcnsOutput);
 
 XTest = preProcessApply(X(testIdx, :),procFcnsInput,settingsXTrain);
-yTest = preProcessApply(t(testIdx, :),procFcnsOutput,settingst);
+% yTest = preProcessApply(t(testIdx, :),procFcnsOutput,settingst);
 
-% call NDT:
+% call ndgSGD:
 % ndtSGD
 % 
-% names = sprintf('ndt_200eps_lr1e-1_bs10000_mmt1e-1_tnoproc_polarMLT.mat');
-% save(fullfile(dir, 'results', names), 'ndt', 'ndtInfo',...
-%     'procFcnsInput', 'settingsX', 'procFcnsOutput', 'settingst')
+names = sprintf('ndt_200eps_lr1e-1_bs10000_mmt1e-1_polarMLT.mat');
+save(fullfile(dir, 'results', names), 'ndt', 'ndtInfo',...
+    'procFcnsInput', 'settingsXTrain')
 
 % call nn45:
-nn45SGD
-names = sprintf('nn45_200eps_lr1e-1_bs10000_mmt1e-1_tnoproc_polarMLT.mat');
+% nn45SGD
+% names = sprintf('nn45_200eps_lr1e-1_bs10000_mmt1e-1_polarMLT.mat');
+% 
+% save(fullfile(dir, 'results', names), 'nn45', 'nn45Info',...
+%     'procFcnsInput', 'settingsXTrain')
 
-save(fullfile(dir, 'results', names), 'nn45', 'nn45Info',...
-    'procFcnsInput', 'settingsXTrain')
+% call ndtLM:
+% ndtLM
+% 
+% names = sprintf('ndt_40eps_polarMLT.mat');
+% save(fullfile(dir, 'results','trainlm', names), 'ndt', 'ndtInfo',...
+%     'procFcnsInput', 'settingsXTrain')
+
+% call nn45LM:
+% nn45LM
+% 
+% names = sprintf('nn45_40eps_polarMLT.mat');
+% save(fullfile(dir, 'results','trainlm', names), 'nn45', 'nn45Info',...
+%     'procFcnsInput', 'settingsXTrain')

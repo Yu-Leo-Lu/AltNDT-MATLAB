@@ -22,10 +22,10 @@ nn45Layers = [featureInputLayer(size(XTrain,2)),...
 
 [nn45, nn45Info] = trainNetwork(XTrain,yTrain,nn45Layers,nn45Options);
 
-fig = findall(groot,'Type','Figure');
-saveas(fig, fullfile(dir, 'figures', 'nn45TrainTest_lr_1e-1'));
-names = sprintf('nn45_40eps_lr_1e-1.mat');
-save(fullfile(dir, 'results', names), 'nn45', 'nn45Info')
+% fig = findall(groot,'Type','Figure');
+% saveas(fig, fullfile(dir, 'figures', 'nn45TrainTest_lr_1e-1'));
+% names = sprintf('nn45_40eps_lr_1e-1.mat');
+% save(fullfile(dir, 'results', names), 'nn45', 'nn45Info')
 
 yPredTest = predict(nn45,XTest);
 rmseTest = sqrt(mean((yTest - yPredTest).^2));
