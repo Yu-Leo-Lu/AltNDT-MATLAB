@@ -1,27 +1,27 @@
-startup
-
-% load PINE data
-[PINE,trainIdx, testIdx] = loadPINE();
-MLT = PINE.data_all.X(:,6); 
-X = PINE.data_all.X;
-t = PINE.data_all.t;
-
-procFcnsInput = {}; procFcnsOutput = {};
-procFcnsInput{1} = 'removeconstantrows'; procFcnsInput{2} = 'mapminmax';
-procFcnsOutput{1} = 'removeconstantrows'; 
-% procFcnsOutput{2} = 'mapminmax';
-
-[XTrain, settingsXTrain] = preProcess(X(trainIdx, :), procFcnsInput);
-[yTrain, settingst] = preProcess(t(trainIdx, :), procFcnsOutput);
-
-XTest = preProcessApply(X(testIdx, :),procFcnsInput,settingsXTrain);
-yTest = preProcessApply(t(testIdx, :),procFcnsOutput,settingst);
+% startup
+% 
+% % load PINE data
+% [PINE,trainIdx, testIdx] = loadPINE();
+% MLT = PINE.data_all.X(:,6); 
+% X = PINE.data_all.X;
+% t = PINE.data_all.t;
+% 
+% procFcnsInput = {}; procFcnsOutput = {};
+% procFcnsInput{1} = 'removeconstantrows'; procFcnsInput{2} = 'mapminmax';
+% procFcnsOutput{1} = 'removeconstantrows'; 
+% % procFcnsOutput{2} = 'mapminmax';
+% 
+% [XTrain, settingsXTrain] = preProcess(X(trainIdx, :), procFcnsInput);
+% [yTrain, settingst] = preProcess(t(trainIdx, :), procFcnsOutput);
+% 
+% XTest = preProcessApply(X(testIdx, :),procFcnsInput,settingsXTrain);
+% yTest = preProcessApply(t(testIdx, :),procFcnsOutput,settingst);
 
 Xp2 = X;
 Xp2(trainIdx,:) = XTrain; Xp2(testIdx,:) = XTest;
 Xp2 = Xp2';
 
-tp2 = t;
+tp2 = Density;
 tp2(trainIdx) = yTrain; tp2(testIdx,:) = yTest;
 tp2 = tp2';
 
@@ -36,10 +36,10 @@ nn45.divideParam.testInd = testIdx;
 %train
 nn45.trainParam.epochs = 40;
 [nn45, nn45Info] = train(nn45,Xp2,tp2);
-names = sprintf('nn45_40eps.mat');
-
-save(fullfile(dir, 'results','trainlm', names), 'nn45', 'nn45Info',...
-    'procFcnsInput', 'settingsXTrain')
+% names = sprintf('nn45_40eps.mat');
+% 
+% save(fullfile(dir, 'results','trainlm', names), 'nn45', 'nn45Info',...
+%     'procFcnsInput', 'settingsXTrain')
 % for i = 1:runs
 %     nn53 = feedforwardnet(53);
 %     nn53 = configure(nn53,X,t);
