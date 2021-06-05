@@ -1,4 +1,4 @@
-function VisualizePca(NeuralNet,ParameterLabels,EnvironParam,nLayer,nZone,procFcnsInput,settingsXTrain,Stat,titleStr,Transition,isColorBar)
+function VisualizePca(NeuralNet,ParameterLabels,EnvironParams,nLayer,nZone,procFcnsInput,settingsXTrain,Stat,titleStr,Transition,isColorBar)
 %
 % Description: Generate a 2D polar plot of electron density in the
 %      plasmasphere predicted by a neural network.
@@ -52,7 +52,7 @@ for iLayer=1:nLayer
                 case 'cmlt'
                     NNParam(k)=cos(MLT(iZone)*pi/180);
                 otherwise
-                    NNParam(k)=EnvironParam(k);
+                    NNParam(k)=EnvironParams(k);
             end
         end
         NNParam = preProcessApply(NNParam, procFcnsInput, settingsXTrain);
