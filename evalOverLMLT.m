@@ -3,15 +3,41 @@ startup
 [PINE,trainIdx, testIdx] = loadPINE();
 inputLabelsGnl = PINE.feature_names;
 inputLabels = [PINE.feature_names(1:5); 'cmlt'; 'smlt'; PINE.feature_names(7:end)];
+MLT = PINE.data_all.X(:,6); polarMLT = zeros(size(MLT,1),2);
+polarMLT(:,1) = cos(MLT*15*pi/180);
+polarMLT(:,2) = sin(MLT*15*pi/180);
+X = [PINE.data_all.X(:,1:5), polarMLT, PINE.data_all.X(:,7:end)];
+L = PINE.data_all.X(:,5);
+Density = PINE.data_all.t;
+
+LTrain = L(trainIdx);
+MLTTrain = MLT(trainIdx);
+DensityTrain = Density(trainIdx);
+XTrain = X(trainIdx,:);
+yTrain = Density(trainIdx);
+
+XTest = X(testIdx,:);
+LTest = L(testIdx);
+MLTTest = MLT(testIdx);
+DensityTest = Density(testIdx);
+yTest = Density(testIdx);
 
 % load models:
 % models
 ndtStatLPolar = load(fullfile(dir, 'results', 'ndt_200eps_lr1e-1_bs10000_mmt1e-1_scaledStatLPolarMLT'));
+ndtAdamStatLPolar = load(fullfile(dir, 'results','testModel', 'ndtAdam_50eps_lr1e-2_bs10000_beta1_9e-1_beta2_9e-1_scaledStatLpolarMLT'));
+ndt32StatLPolar = load(fullfile(dir, 'results', 't  estModel', 'ndt32_50eps_lr1e-1_bs10000_mmt1e-1_scaledStatLPolarMLT'));
 nn45StatLPolar = load(fullfile(dir, 'results', 'nn45_200eps_lr1e-1_bs10000_mmt1e-1_scaledStatLPolarMLT'));
+ndt15AdamStatLPolar = load(fullfile(dir, 'results','testModel', 'ndt15Adam_50eps_lr1e-2_bs10000_beta1_9e-1_beta2_9e-1_scaledStatLpolarMLT'));
+ndt32AdamStatLPolar = load(fullfile(dir, 'results','testModel', 'ndt32Adam_50eps_lr1e-2_bs10000_beta1_9e-1_beta2_9e-1_scaledStatLpolarMLT'));
+ndt64AdamStatLPolar = load(fullfile(dir, 'results','testModel', 'ndt64Adam_50eps_lr1e-2_bs10000_beta1_9e-1_beta2_9e-1_scaledStatLpolarMLT'));
 
 % with polarMLT only
 ndtPolar = load(fullfile(dir, 'results', 'ndt_200eps_lr1e-1_bs10000_mmt1e-1_polarMLT.mat'));
 nn45Polar = load(fullfile(dir, 'results', 'nn45_200eps_lr1e-1_bs10000_mmt1e-1_polarMLT.mat'));
+ndtAdamPolar = load(fullfile(dir, 'results','testModel', 'ndtAdam_20eps_lr1e-2_bs10000_beta1_9e-1_beta2_9e-1_polarMLT'));
+ndt15AdamPolar = load(fullfile(dir, 'results','testModel', 'ndt15Adam_200eps_lr1e-2_bs10000_beta1_9e-1_beta2_9e-1_polarMLT'));
+ndt15Polar = load(fullfile(dir, 'results','testModel', 'ndt15_neps_lr1e-1_bs10000_mmt9e-1_polarMLT'));
 
 % with non-StatPolar
 ndtModel = load(fullfile(dir, 'results', 'ndt_200eps_lr1e-1_bs10000_mmt1e-1_tnoproc.mat'));
@@ -19,50 +45,249 @@ nn45Model = load(fullfile(dir, 'results', 'nn45_200eps_lr1e-1_bs10000_mmt1e-1_tn
 
 % LM models
 nn45LM = load(fullfile(dir,'results','trainlm','nn45_40eps.mat'));
+nn45StatLPolarLM = load(fullfile(dir, 'results','trainlm', 'nn45_40eps_scaledStatLPolarMLT.mat'));
 ndtLM = load(fullfile(dir,'results','trainlm','ndt_40eps.mat'));
 ndtPolarLM = load(fullfile(dir, 'results','trainlm', 'ndt_40eps_polarMLT.mat'));
 ndtStatLPolarLM = load(fullfile(dir, 'results','trainlm', 'ndt_40eps_scaledStatLPolarMLT.mat'));
-
+ndtStatWeightLPolarLM = load(fullfile(dir, 'results','trainlm', 'ndt_40eps_statLscaledWeightedPolarMLT'));
 
 % prediction in events from 2001
 load(fullfile(dir, 'PINE_data', 'data2001'));
 load(fullfile(dir, 'PINE_data', 'data2001Hourly'));
-
-DateStr = '10-Jun-2001'; hrs = 06; mins = 33;
+transition = 1.4;
+                                                                         
+DateStr = '26-Jun-2001'; hr = 19; min = 33;
 days = datenum(DateStr) - datenum(2001,1,1);
-xTryGnl = data2001(days*24*60+hrs*60+mins,:);
+xTryGnl = data2001(days*24*60+hr*60+min,:);
 xTry = [xTryGnl(1:6),nan,xTryGnl(7:end)];
-
 % xTryGnlH = data2001Hourly(days*24+hrs,:);
 % xTryH = [xTryGnlH(1:6),nan,xTryGnlH(7:end)];
 % xTryGstack = [xTryGnl;xTryGnlH];
 
-figure; % by one testing data xTry or xTryGnl
-subplot(2,3,1);
-VisualizePredictionPlasmaSphere(ndtModel.ndt,inputLabelsGnl,xTryGnl,12,72,ndtModel.procFcnsInput,ndtModel.settingsXTrain,[],'in General ndt',1.3)
-subplot(2,3,2);
-VisualizePredictionPlasmaSphere(ndtPolar.ndt,inputLabels,xTry,12,72,ndtPolar.procFcnsInput,ndtPolar.settingsXTrain,[], 'in Polar ndt')
-subplot(2,3,3);
-VisualizePredictionPlasmaSphere(ndtStatLPolar.ndt,inputLabels,xTry,12,72,ndtStatLPolar.procFcnsInput,ndtStatLPolar.settingsXTrain,ndtStatLPolar.Stat, 'in Stat scaled Polar ndt')
-subplot(2,3,4);
-VisualizePredictionPlasmaSphere(nn45Model.nn45,inputLabelsGnl,xTryGnl,12,72,nn45Model.procFcnsInput,nn45Model.settingsXTrain,[],'in General nn45')
-subplot(2,3,5);
-VisualizePredictionPlasmaSphere(nn45Polar.nn45,inputLabels,xTry,12,72,nn45Polar.procFcnsInput,nn45Polar.settingsXTrain,[], 'in Polar nn45')
-subplot(2,3,6);
-VisualizePredictionPlasmaSphere(nn45StatLPolar.nn45,inputLabels,xTry,12,72,nn45StatLPolar.procFcnsInput,nn45StatLPolar.settingsXTrain,nn45StatLPolar.Stat, 'in Stat scaled Polar nn45')
-sgtitle([DateStr,' ',num2str(hrs),':', num2str(mins)]);
+DateStrs = {'26-Jun-2001','26-Jun-2001','26-Jun-2001','27-Jun-2001','27-Jun-2001'};
+hrs = [11,19,22,00,11]; mins = [51,33,06,09,23];
+xTryGnls = NaN(5,30); xTrys = NaN(5,31);
+for i = 1:5
+    DateStr = DateStrs{i}; hr = hrs(i); min = mins(i);
+    days = datenum(DateStr) - datenum(2001,1,1);
+    xTryGnl = data2001(days*24*60+hr*60+min,:);
+    xTry = [xTryGnl(1:6),nan,xTryGnl(7:end)];
+    xTryGnls(i,:) = xTryGnl; xTrys(i,:) = xTry;
+end
+% ------------------- compare polarMLT vs PINE -------------------
+
+% figure; 
+% for i = 1:5
+%     timeTitle=[DateStrs{i},' ',num2str(hrs(i),'%02.f'),':', num2str(mins(i),'%02.f')];
+%     subplot(2,5,i);
+%     VisualizePredictionPlasmaSphere(ndtPolarLM.ndt,inputLabels,xTrys(i,:),...
+%     12,72,ndtPolarLM.procFcnsInput,ndtPolarLM.settingsXTrain,[],timeTitle,[],0)
+%     subplot(2,5,i+5);
+%     VisualizePredictionPlasmaSphere(nn45LM.nn45,inputLabelsGnl,xTryGnls(i,:),...
+%         12,72,nn45LM.procFcnsInput,nn45LM.settingsXTrain,[],'',[],0)
+% end
+
+% ------------------- debugging -------------------
+xTry=SampleX31{2}(2,:);
+figure; 
+subplot(3,1,1);
+VisualizePredictionPlasmaSphereByWeights(ndtStatWeightLPolarLM.ndt,inputLabels,xTry,...
+        12,72,ndtStatWeightLPolarLM.procFcnsInput,ndtStatWeightLPolarLM.settingsXTrain,ndtStatWeightLPolarLM.Stat,'',[],0)
+subplot(3,1,2);
+VisualizePredictionPlasmaSphere(ndtStatLPolarLM.ndt,inputLabels,xTry,...
+        12,72,ndtStatLPolarLM.procFcnsInput,ndtStatLPolarLM.settingsXTrain,ndtStatLPolarLM.Stat,'',[],0)
+subplot(3,1,3);
+VisualizePredictionPlasmaSphere(ndtPolarLM.ndt,inputLabels,xTry,...
+    12,72,ndtPolarLM.procFcnsInput,ndtPolarLM.settingsXTrain,[],'',[],0)
+
+% ----------------- Principal Component plot -----------------
+[X1, X3]=loadSampleX();
+X1StdTitle=X1{1}; X1Std31=X1{2}; X1Std30=X1{3};
+X3StdTitle=X3{1}; X3Std31=X3{2}; X3Std30=X3{3};
+
+% make plot columns 1-5 PCs
+% row 1-2, NDT -/+ 1 std
+% row 3-4, PINE -/+ 1 std
+figure; 
+for i = 1:5
+    for j = 1:2
+            subplot(4,5,i);
+            VisualizePredictionPlasmaSphereByWeights(ndtStatWeightLPolarLM.ndt,inputLabels,X1Std31{i+1}(1,:),...
+                12,72,ndtStatWeightLPolarLM.procFcnsInput,ndtStatWeightLPolarLM.settingsXTrain,ndtStatWeightLPolarLM.Stat,'',[],0)
+            subplot(4,5,i+5);
+             VisualizePredictionPlasmaSphereByWeights(ndtStatWeightLPolarLM.ndt,inputLabels,X1Std31{i+1}(2,:),...
+                12,72,ndtStatWeightLPolarLM.procFcnsInput,ndtStatWeightLPolarLM.settingsXTrain,ndtStatWeightLPolarLM.Stat,'',[],0)
+    end
+    for j = 1:2
+            subplot(4,5,i+10);
+            VisualizePredictionPlasmaSphere(nn45LM.nn45,inputLabelsGnl,X1Std30{i+1}(1,:),...
+                12,72,nn45LM.procFcnsInput,nn45LM.settingsXTrain,[],'',[],0)
+            subplot(4,5,i+15);
+            VisualizePredictionPlasmaSphere(nn45LM.nn45,inputLabelsGnl,X1Std30{i+1}(2,:),...
+                12,72,nn45LM.procFcnsInput,nn45LM.settingsXTrain,[],'',[],0)
+    end
+end
+
+% TODO: fix color bar
+% add title on top
+% try -/+ 0.1 std
+% make similar plot on NDT stat weighted, NDT stat, NDT polar
+
+
+% ----------------- Avg plot -----------------
+xAvg31 = [nanmean(XTrain); nanmean(XTest); nanmean(X)];
+xAvg30 = [nanmean(PINE.data_all.X(trainIdx,:)); nanmean(PINE.data_all.X(testIdx,:));nanmean(PINE.data_all.X)];
+title={'Training Avg'; 'Testing Avg'; 'Overall Avg'};
+figure; 
+for i = 1:3
+    subplot(4,3,i);
+    VisualizePredictionPlasmaSphereByWeights(ndtStatWeightLPolarLM.ndt,inputLabels,xAvg31(i,:),...
+        12,72,ndtStatWeightLPolarLM.procFcnsInput,ndtStatWeightLPolarLM.settingsXTrain,ndtStatWeightLPolarLM.Stat,title{i},[],0)
+    subplot(4,3,i+3);
+    VisualizePredictionPlasmaSphere(ndtStatLPolarLM.ndt,inputLabels,xAvg31(i,:),...
+        12,72,ndtStatLPolarLM.procFcnsInput,ndtStatLPolarLM.settingsXTrain,ndtStatLPolarLM.Stat,'',[],0)
+    subplot(4,3,i+3*2);
+    VisualizePredictionPlasmaSphere(ndtPolarLM.ndt,inputLabels,xAvg31(i,:),...
+        12,72,ndtPolarLM.procFcnsInput,ndtPolarLM.settingsXTrain,[],'',[],0)
+    subplot(4,3,i+3*3);
+    VisualizePredictionPlasmaSphere(nn45LM.nn45,inputLabelsGnl,xAvg30(i,:),...
+        12,72,nn45LM.procFcnsInput,nn45LM.settingsXTrain,[],'',[],0)
+end
+% ----------------- WeightLPolarMLT,StatLPolarMLT, polarMLT, PINE -----------------
+figure; 
+for i = 1:5
+    timeTitle=[DateStrs{i},' ',num2str(hrs(i),'%02.f'),':', num2str(mins(i),'%02.f')];
+    subplot(4,5,i);
+    VisualizePredictionPlasmaSphereByWeights(ndtStatWeightLPolarLM.ndt,inputLabels,xTrys(i,:),...
+        12,72,ndtStatWeightLPolarLM.procFcnsInput,ndtStatWeightLPolarLM.settingsXTrain,ndtStatWeightLPolarLM.Stat,timeTitle,[],0)
+    subplot(4,5,i+5);
+    VisualizePredictionPlasmaSphere(ndtStatLPolarLM.ndt,inputLabels,xTrys(i,:),...
+        12,72,ndtStatLPolarLM.procFcnsInput,ndtStatLPolarLM.settingsXTrain,ndtStatLPolarLM.Stat,'',[],0)
+    subplot(4,5,i+5*2);
+    VisualizePredictionPlasmaSphere(ndtPolarLM.ndt,inputLabels,xTrys(i,:),...
+        12,72,ndtPolarLM.procFcnsInput,ndtPolarLM.settingsXTrain,[],'',[],0)
+    subplot(4,5,i+5*3);
+    VisualizePredictionPlasmaSphere(nn45LM.nn45,inputLabelsGnl,xTryGnls(i,:),...
+        12,72,nn45LM.procFcnsInput,nn45LM.settingsXTrain,[],'',[],0)
+end
+% -----------------compare StatLPolarMLT, polarMLT vs PINE-----------------
+figure; 
+for i = 1:5
+    timeTitle=[DateStrs{i},' ',num2str(hrs(i),'%02.f'),':', num2str(mins(i),'%02.f')];
+    subplot(3,5,i);
+    VisualizePredictionPlasmaSphere(ndtStatLPolarLM.ndt,inputLabels,xTrys(i,:),...
+        12,72,ndtStatLPolarLM.procFcnsInput,ndtStatLPolarLM.settingsXTrain,ndtStatLPolarLM.Stat,timeTitle,[],0)
+    subplot(3,5,i+5);
+    VisualizePredictionPlasmaSphere(ndtPolarLM.ndt,inputLabels,xTrys(i,:),...
+        12,72,ndtPolarLM.procFcnsInput,ndtPolarLM.settingsXTrain,[],'',[],0)
+    subplot(3,5,i+5*2);
+    VisualizePredictionPlasmaSphere(nn45LM.nn45,inputLabelsGnl,xTryGnls(i,:),...
+        12,72,nn45LM.procFcnsInput,nn45LM.settingsXTrain,[],'',[],0)
+end
+
+% ----------------- get color bar plot -----------------
+figure;
+VisualizePredictionPlasmaSphere(ndtPolarLM.ndt,inputLabels,xTrys(i,:),...
+    12,72,ndtPolarLM.procFcnsInput,ndtPolarLM.settingsXTrain,[],'',[],1)
+
+
+% Stat Model NDT, SGD, ADAM and LM
+figure;
+subplot(2,3,1)
+VisualizePredictionPlasmaSphere(ndtStatLPolar.ndt,inputLabels,xTry,...,
+    12,72,ndtStatLPolar.procFcnsInput,ndtStatLPolar.settingsXTrain,...,
+    ndtStatLPolar.Stat, 'in scaled Stat Polar SGD ndt',transition)
+subplot(2,3,2)
+VisualizePredictionPlasmaSphere(ndtAdamStatLPolar.ndt,inputLabels,xTry,...,
+    12,72,ndtAdamStatLPolar.procFcnsInput,ndtAdamStatLPolar.settingsXTrain,...,
+    ndtAdamStatLPolar.Stat, 'in scaled Stat Polar Adam ndt',transition)
+subplot(2,3,3)
+VisualizePredictionPlasmaSphere(ndtStatLPolarLM.ndt,inputLabels,xTry,...,
+    12,72,ndtStatLPolarLM.procFcnsInput,ndtStatLPolarLM.settingsXTrain,...,
+    ndtStatLPolarLM.Stat, 'in scaled Stat Polar LM ndt',transition)
+
+subplot(2,3,4)
+VisualizePredictionPlasmaSphere(ndt32StatLPolar.ndt,inputLabels,xTry,...,
+    12,72,ndt32StatLPolar.procFcnsInput,ndt32StatLPolar.settingsXTrain,...,
+    ndt32StatLPolar.Stat, 'in scaled Stat Polar SGD ndt32',transition)
+subplot(2,3,5)
+VisualizePredictionPlasmaSphere(ndt32AdamStatLPolar.ndt,inputLabels,xTry,...,
+    12,72,ndt32AdamStatLPolar.procFcnsInput,ndt32AdamStatLPolar.settingsXTrain,...,
+    ndt32AdamStatLPolar.Stat, 'in scaled Stat Polar Adam ndt32',transition)
+subplot(2,3,6)
+VisualizePredictionPlasmaSphere(ndt64AdamStatLPolar.ndt,inputLabels,xTry,...,
+    12,72,ndt64AdamStatLPolar.procFcnsInput,ndt64AdamStatLPolar.settingsXTrain,...,
+    ndt64AdamStatLPolar.Stat, 'in scaled Stat Polar Adam ndt64',transition)
+sgtitle([DateStr,' ',num2str(hr),':', num2str(min)]);
+
+
+% Stat Model test
+figure;
+subplot(2,3,1)
+VisualizePredictionPlasmaSphere(ndtStatLPolar.ndt,inputLabels,xTry,...,
+    12,72,ndtStatLPolar.procFcnsInput,ndtStatLPolar.settingsXTrain,...,
+    ndtStatLPolar.Stat, 'in scaled Stat Polar SGD ndt',transition)
+subplot(2,3,2)
+VisualizePredictionPlasmaSphere(ndtAdamStatLPolar.ndt,inputLabels,xTry,...,
+    12,72,ndtAdamStatLPolar.procFcnsInput,ndtAdamStatLPolar.settingsXTrain,...,
+    ndtAdamStatLPolar.Stat, 'in scaled Stat Polar Adam ndt',transition)
+subplot(2,3,4)
+VisualizePredictionPlasmaSphere(ndt15AdamStatLPolar.ndt,inputLabels,xTry,...,
+    12,72,ndt15AdamStatLPolar.procFcnsInput,ndt15AdamStatLPolar.settingsXTrain,...,
+    ndt15AdamStatLPolar.Stat, 'in scaled Stat Polar Adam ndt15',transition)
+subplot(2,3,5)
+VisualizePredictionPlasmaSphere(ndt32AdamStatLPolar.ndt,inputLabels,xTry,...,
+    12,72,ndt32AdamStatLPolar.procFcnsInput,ndt32AdamStatLPolar.settingsXTrain,...,
+    ndt32AdamStatLPolar.Stat, 'in scaled Stat Polar Adam ndt32',transition)
+sgtitle([DateStr,' ',num2str(hr),':', num2str(min)]);
+
+% Model test
+figure;
+subplot(2,3,1)
+VisualizePredictionPlasmaSphere(ndtAdamPolar.ndt,inputLabels,xTry,...
+    12,72,ndtAdamPolar.procFcnsInput,ndtAdamPolar.settingsXTrain,...
+    [], 'in Polar Adam ndt',transition)
+subplot(2,3,2)
+VisualizePredictionPlasmaSphere(ndt15AdamPolar.ndt,inputLabels,xTry,...
+    12,72,ndt15AdamPolar.procFcnsInput,ndt15AdamPolar.settingsXTrain,...
+    [], 'in Polar Adam ndt15',transition)
+subplot(2,3,4)
+VisualizePredictionPlasmaSphere(ndtPolar.ndt,inputLabels,xTry,...
+    12,72,ndtPolar.procFcnsInput,ndtPolar.settingsXTrain,...
+    [], 'in Polar SGD ndt',transition)
+subplot(2,3,5)
+VisualizePredictionPlasmaSphere(ndt15Polar.ndt,inputLabels,xTry,...
+    12,72,ndt15Polar.procFcnsInput,ndt15Polar.settingsXTrain,[],...
+    'in Polar SGD ndt15',transition)
+sgtitle([DateStr,' ',num2str(hr),':', num2str(min)]);
+
+
+% Stat Model test
+figure;
+subplot(2,3,1)
+VisualizePredictionPlasmaSphere(ndtStatLPolar.ndt,inputLabels,xTry,12,72,ndtStatLPolar.procFcnsInput,ndtStatLPolar.settingsXTrain,ndtStatLPolar.Stat, 'in scaled Stat Polar SGD ndt',transition)
+subplot(2,3,2)
+VisualizePredictionPlasmaSphere(ndtAdamStatLPolar.ndt,inputLabels,xTry,12,72,ndtAdamStatLPolar.procFcnsInput,ndtAdamStatLPolar.settingsXTrain,ndtAdamStatLPolar.Stat, 'in scaled Stat Polar Adam ndt',transition)
+subplot(2,3,4)
+VisualizePredictionPlasmaSphere(ndt15AdamPolar.ndt,inputLabels,xTry,12,72,ndt15AdamPolar.procFcnsInput,ndt15AdamPolar.settingsXTrain,ndt15AdamPolar.Stat, 'in scaled Stat Polar Adam ndt15',transition)
+subplot(2,3,5)
+VisualizePredictionPlasmaSphere(ndt32AdamStatLPolar.ndt,inputLabels,xTry,12,72,ndt32AdamStatLPolar.procFcnsInput,ndt32AdamStatLPolar.settingsXTrain,ndt32AdamStatLPolar.Stat, 'in scaled Stat Polar Adam ndt32',transition)
+sgtitle([DateStr,' ',num2str(hr),':', num2str(min)]);
 
 % include LM comparison
 figure; % by one testing data xTryGnl
 subplot(2,3,1);
-VisualizePredictionPlasmaSphere(ndtLM.ndt,inputLabelsGnl,xTryGnl,12,72,ndtLM.procFcnsInput,ndtLM.settingsXTrain,[], 'in General ndtLM')
+VisualizePredictionPlasmaSphere(ndtLM.ndt,inputLabelsGnl,xTryGnl,12,72,ndtLM.procFcnsInput,ndtLM.settingsXTrain,[], 'in General ndtLM',transition)
 subplot(2,3,2);
-VisualizePredictionPlasmaSphere(ndtPolarLM.ndt,inputLabels,xTry,12,72,ndtPolarLM.procFcnsInput,ndtPolarLM.settingsXTrain,[], 'in Polar ndtLM')
+VisualizePredictionPlasmaSphere(ndtPolarLM.ndt,inputLabels,xTry,12,72,ndtPolarLM.procFcnsInput,ndtPolarLM.settingsXTrain,[], 'in Polar ndtLM',transition)
 subplot(2,3,3);
-VisualizePredictionPlasmaSphere(ndtStatLPolarLM.ndt,inputLabels,xTry,12,72,ndtStatLPolarLM.procFcnsInput,ndtStatLPolarLM.settingsXTrain,ndtStatLPolarLM.Stat, 'in Stat Scaled Polar ndtLM')
+VisualizePredictionPlasmaSphere(ndtStatLPolarLM.ndt,inputLabels,xTry,12,72,ndtStatLPolarLM.procFcnsInput,ndtStatLPolarLM.settingsXTrain,ndtStatLPolarLM.Stat, 'in Stat Scaled Polar ndtLM',transition)
 subplot(2,3,4);
-VisualizePredictionPlasmaSphere(nn45LM.nn45,inputLabelsGnl,xTryGnl,12,72,nn45LM.procFcnsInput,nn45LM.settingsXTrain,[], 'in General nn45LM')
-sgtitle([DateStr,' ',num2str(hrs),':', num2str(mins)]);
+VisualizePredictionPlasmaSphere(nn45LM.nn45,inputLabelsGnl,xTryGnl,12,72,nn45LM.procFcnsInput,nn45LM.settingsXTrain,[], 'in General nn45LM',transition)
+sgtitle([DateStr,' ',num2str(hr),':', num2str(min)]);
+subplot(2,3,6);
+VisualizePredictionPlasmaSphere(nn45StatLPolarLM.nn45,inputLabels,xTry,12,72,nn45StatLPolarLM.procFcnsInput,nn45StatLPolarLM.settingsXTrain,nn45StatLPolarLM.Stat, 'in Stat Scaled Polar nn45LM',transition)
+sgtitle([DateStr,' ',num2str(hr),':', num2str(min)]);
 
 
 % more comparison?
@@ -71,7 +296,7 @@ subplot(2,3,1);
 VisualizePredictionPlasmaSphere(nn45LM.nn45,inputLabelsGnl,xTryGnl,12,72,nn45LM.procFcnsInput,nn45LM.settingsXTrain,[], 'in General nn45LM')
 subplot(2,3,4);
 VisualizePredictionPlasmaSphere(nn45Model.nn45,inputLabelsGnl,xTryGnl,12,72,nn45Model.procFcnsInput,nn45Model.settingsXTrain,[],'in General nn45SGD')
-sgtitle([DateStr,' ',num2str(hrs),':', num2str(mins)]);
+sgtitle([DateStr,' ',num2str(hr),':', num2str(min)]);
 
 
 % find idx by kp, X(:,2)

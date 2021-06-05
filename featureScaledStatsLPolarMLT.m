@@ -86,13 +86,16 @@ XTest = preProcessApply(XTest, procFcnsInput, settingsXTrain);
 % yTrain = yTrain(setdiff(1:length(yTrain),ind));
 
 % call ndtSGD:
-% ndtSGD
+ndtSGD
 % 
-% names = sprintf('ndt_200eps_lr1e-1_bs10000_mmt1e-1_scaledStatLPolarMLT.mat');
+% names = sprintf('ndt15_50eps_lr1e-1_bs10000_mmt1e-1_scaledStatLPolarMLT.mat');
 % 
 % save(fullfile(dir, 'results', names), 'ndt', 'ndtInfo',...
 %     'procFcnsInput', 'settingsXTrain', 'Stat')
-
+names = sprintf('ndt64Adam_50eps_lr1e-2_bs10000_beta1_9e-1_beta2_9e-1_scaledStatLpolarMLT.mat');
+save(fullfile(dir, 'results','testModel', names), 'ndt', 'ndtInfo',...
+     'procFcnsInput', 'settingsXTrain', 'Stat')
+ 
 % call nn45SGD:
 % nn45SGD
 % 
@@ -102,12 +105,17 @@ XTest = preProcessApply(XTest, procFcnsInput, settingsXTrain);
 %     'procFcnsInput', 'settingsXTrain', 'Stat')
 
 % call ndtLM:
-ndtLM
-names = sprintf('ndt_40eps_scaledStatLPolarMLT.mat');
-save(fullfile(dir, 'results', 'trainlm', names), 'ndt', 'ndtInfo',...
-    'procFcnsInput', 'settingsXTrain', 'Stat')
+% ndtLM
+% names = sprintf('ndt_40eps_scaledStatLPolarMLT.mat');
+% save(fullfile(dir, 'results', 'trainlm', names), 'ndt', 'ndtInfo',...
+%     'procFcnsInput', 'settingsXTrain', 'Stat')
 
-
+% call nn45LM
+% nn45LM
+% 
+% names = sprintf('nn45_40eps_scaledStatLPolarMLT.mat');
+% save(fullfile(dir, 'results','trainlm', names), 'nn45', 'nn45Info',...
+%     'procFcnsInput', 'settingsXTrain', 'Stat')
 
 
 

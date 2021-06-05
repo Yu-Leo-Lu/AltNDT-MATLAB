@@ -1,4 +1,5 @@
 addpath('framework')
+addpath('Visualization')
 
 % desktop path
 dir = 'E:\Google Drive\A-projects\PINE\';

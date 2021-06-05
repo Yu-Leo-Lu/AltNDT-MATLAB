@@ -1,4 +1,4 @@
-function VisualizePredictionPlasmaSphere(NeuralNet,ParameterLabels,EnvironParam,nLayer,nZone,procFcnsInput,settingsXTrain,Stat,titleStr,Transition,isColorBar)
+function VisualizePredictionPlasmaSphereByWeights(NeuralNet,ParameterLabels,EnvironParam,nLayer,nZone,procFcnsInput,settingsXTrain,Stat,titleStr,Transition,isColorBar)
 %
 % Description: Generate a 2D polar plot of electron density in the
 %      plasmasphere predicted by a neural network.
@@ -35,9 +35,13 @@ if isempty(indMLT)
     indCML=find(strcmp(ParameterLabels,'cmlt')==1);
 end
 NNParam=zeros(1, length(ParameterLabels));
-%
+
+statLRange = [Stat.LRange]';
+statnDataPoint = sqrt([Stat.nDataPoint])/100;
+statMean = [Stat.DensityMean];
+statStd = [Stat.DensitySTD];
+
 % Evaluate electron density
-%
 for iLayer=1:nLayer
     for iZone=1:nZone
         for k=1:length(ParameterLabels)
@@ -64,26 +68,10 @@ for iLayer=1:nLayer
             % by LM
             yPred = NeuralNet(NNParam');
         end
-
-        % if the model is Stat scaled:
-        if ~isempty(Stat)
-            statMean = [Stat.DensityMean];
-            statStd = [Stat.DensitySTD];
-%             statnData = [Stat.nDataPoint];
-            statLRange = [Stat.LRange]';
-%             statLonRange = [Stat.LonRange]';
-            iL = find(statLRange(:,1)<L(iLayer) & statLRange(:,2)>L(iLayer));
-%             iLMLT = find(statLRange(:,1)<L(iLayer) & statLRange(:,2)>L(iLayer) &...
-%                 statLonRange(:,1)<MLT(iZone) & statLonRange(:,2)>MLT(iZone));
-%             if isempty(iLMLT) || statnData(iLMLT)<=1
-%                 Density(iZone,iLayer) = yPred*nanmean(statStd(iL)) + nanmean(statMean(iL));
-%             else
-%                 Density(iZone,iLayer) = yPred*statStd(iLMLT) + statMean(iLMLT);
-%             end
-            Density(iZone,iLayer) = yPred*nanmean(statStd(iL)) + nanmean(statMean(iL));
-        else
-            Density(iZone,iLayer) = yPred;
-        end
+        % model is weighted, then stat scaled:
+        iL = find(statLRange(:,1)<L(iLayer) & statLRange(:,2)>L(iLayer));
+        yPred = yPred*nanmean(statStd(iL))*nanmean(statnDataPoint(iL)) + nanmean(statMean(iL));
+        Density(iZone,iLayer) = yPred;
     end
 end
 %

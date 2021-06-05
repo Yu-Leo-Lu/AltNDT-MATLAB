@@ -89,11 +89,11 @@ XTest = preProcessApply(XTest, procFcnsInput, settingsXTrain);
 
 % call NDT:
 % ndtSGD
-
-names = sprintf('ndt_200eps_lr1e-1_bs10000_mmt1e-1_statFeat.mat');
-
-save(fullfile(dir, 'results', names), 'ndt', 'ndtInfo',...
-    'procFcnsInput', 'settingsXTrain', 'Stat')
+% 
+% names = sprintf('ndt_200eps_lr1e-1_bs10000_mmt1e-1_statFeat.mat');
+% 
+% save(fullfile(dir, 'results', names), 'ndt', 'ndtInfo',...
+%     'procFcnsInput', 'settingsXTrain', 'Stat')
 
 % call NN45:
 % nn45SGD
