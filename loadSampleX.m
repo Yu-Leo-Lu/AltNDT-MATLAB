@@ -1,4 +1,4 @@
-function [X1, X3]=loadSampleX()
+function [X1, X3]=loadSampleX(pcaPortion)
 startup
 Samples = load('SampleX.mat');
 
@@ -20,8 +20,8 @@ for i = 1:length(X3Std)
     else
         X3StdTitle{i}{1} = ['PC',num2str(i-1),' -3std'];
         X3StdTitle{i}{2} = ['PC',num2str(i-1),' +3std'];
-        X1StdTitle{i}{1} = ['PC',num2str(i-1),' -1std'];
-        X1StdTitle{i}{2} = ['PC',num2str(i-1),' +1std'];
+        X1StdTitle{i}{1} = ['PC',num2str(i-1),['- ',num2str(pcaPortion),'std']];
+        X1StdTitle{i}{2} = ['PC',num2str(i-1),['- ',num2str(pcaPortion),'std']];
     end
 end
 
@@ -39,8 +39,8 @@ for i = 1:length(X3Std)
         row1 = X3Std{i}(1,:);
         row2 = X3Std{i}(2,:);
         Xbar = (row1+row2)/2;
-        row1_1Std = Xbar-(row1-row2)/3;
-        row2_1Std = Xbar+(row1-row2)/3;
+        row1_1Std = Xbar-pcaPortion*(row1-row2)/3;
+        row2_1Std = Xbar+pcaPortion*(row1-row2)/3;
         
         X3Std31{i}(1,:) = [row1(1:4), nan,nan,nan, row1(5:end)];
         X3Std31{i}(2,:) = [row2(1:4), nan,nan,nan, row2(5:end)];
