@@ -38,10 +38,9 @@ NNParam=zeros(2, length(ParameterLabels));
 yPred=zeros(2,1);
 
 statLRange = [Stat.LRange]';
-statnDataPoint = [Stat.nDataPoint];
 statMean = [Stat.DensityMean];
 statStd = [Stat.DensitySTD];
-
+statWeight = [Stat.ringWeight];
 % Evaluate electron density
 for iLayer=1:nLayer
     for iZone=1:nZone
@@ -72,20 +71,7 @@ for iLayer=1:nLayer
             end
             % model is weighted, then stat scaled:
             iL = find(statLRange(:,1)<L(iLayer) & statLRange(:,2)>L(iLayer));
-            
-            % weight scaled proportional to density, not just # of data pts
-            if statLRange(iL,2)~= inf
-                ringArea = pi*(statLRange(iL,2)^2 - statLRange(iL,1)^2);
-            else
-                % 6.5697 = max earth radii recorded in XTrain, max(XTrain(:,5))
-                ringArea = pi*(6.5697^2 - statLRange(iL,1)^2);
-            end
-            ringDensity = statnDataPoint(iL)/ringArea;
-            ringWeight = sqrt(ringDensity)/10;
-    
-            
-            
-            yPred(iRow) = yPred(iRow)*nanmean(statStd(iL))*nanmean(ringWeight) + nanmean(statMean(iL));
+            yPred(iRow) = yPred(iRow)*nanmean(statStd(iL))*nanmean(statWeight(iL)) + nanmean(statMean(iL));
         end
         Density(iZone,iLayer) = yPred(2)-yPred(1);
     end
@@ -144,7 +130,7 @@ patch(x,y,[0,0,0]);
 x=cos((90:270)*pi/180);
 y=sin((90:270)*pi/180);
 patch(x,y,[1,1,1]);
-caxis([-2,2]);
+caxis([-1,1]);
 h=colorbar;
 myMap = jet;
 

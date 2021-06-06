@@ -24,6 +24,13 @@ if isempty(titleStr)
     titleStr = '';
 end
 
+% if the model is Stat scaled:
+if ~isempty(Stat)
+    statMean = [Stat.DensityMean];
+    statStd = [Stat.DensitySTD];
+    statLRange = [Stat.LRange]';
+end
+            
 Density=NaN(nZone,nLayer);
 L=1+5*[0.5:1:nLayer-0.5]/nLayer;
 % MLT: 0-360 in degree
@@ -34,56 +41,47 @@ if isempty(indMLT)
     indSML=find(strcmp(ParameterLabels,'smlt')==1);
     indCML=find(strcmp(ParameterLabels,'cmlt')==1);
 end
-NNParam=zeros(1, length(ParameterLabels));
+NNParam=zeros(2, length(ParameterLabels));
+yPred=zeros(2,1);
 %
 % Evaluate electron density
 %
 for iLayer=1:nLayer
     for iZone=1:nZone
-        for k=1:length(ParameterLabels)
-            switch ParameterLabels{k}
-                case 'l'
-                    NNParam(k)=L(iLayer);
-                case 'mlt'
-                    % why /15? convert MLT from degree 0-360 to time 0-24
-                    NNParam(k)=MLT(iZone)/15;
-                case 'smlt'
-                    NNParam(k)=sin(MLT(iZone)*pi/180);
-                case 'cmlt'
-                    NNParam(k)=cos(MLT(iZone)*pi/180);
-                otherwise
-                    NNParam(k)=EnvironParams(k);
+        for iRow = 1:2
+            for k=1:length(ParameterLabels)
+                switch ParameterLabels{k}
+                    case 'l'
+                        NNParam(iRow,k)=L(iLayer);
+                    case 'mlt'
+                        % why /15? convert MLT from degree 0-360 to time 0-24
+                        NNParam(iRow,k)=MLT(iZone)/15;
+                    case 'smlt'
+                        NNParam(iRow,k)=sin(MLT(iZone)*pi/180);
+                    case 'cmlt'
+                        NNParam(iRow,k)=cos(MLT(iZone)*pi/180);
+                    otherwise
+                        NNParam(iRow,k)=EnvironParams(iRow,k);
+                end
+            end
+            
+            NNParam(iRow,:) = preProcessApply(NNParam(iRow,:), procFcnsInput, settingsXTrain);
+            
+            try
+                % by SGD
+                yPred(iRow)=predict(NeuralNet,NNParam(iRow,:));
+            catch
+                % by LM
+                yPred(iRow) = NeuralNet(NNParam(iRow,:)');
+            end
+            
+            % if the model is Stat scaled:
+            if ~isempty(Stat)
+                iL = find(statLRange(:,1)<L(iLayer) & statLRange(:,2)>L(iLayer));
+                yPred(iRow) = yPred(iRow)*nanmean(statStd(iL)) + nanmean(statMean(iL));  
             end
         end
-        NNParam = preProcessApply(NNParam, procFcnsInput, settingsXTrain);
-        
-        try
-            % by SGD
-            yPred=predict(NeuralNet,NNParam);
-        catch
-            % by LM
-            yPred = NeuralNet(NNParam');
-        end
-
-        % if the model is Stat scaled:
-        if ~isempty(Stat)
-            statMean = [Stat.DensityMean];
-            statStd = [Stat.DensitySTD];
-%             statnData = [Stat.nDataPoint];
-            statLRange = [Stat.LRange]';
-%             statLonRange = [Stat.LonRange]';
-            iL = find(statLRange(:,1)<L(iLayer) & statLRange(:,2)>L(iLayer));
-%             iLMLT = find(statLRange(:,1)<L(iLayer) & statLRange(:,2)>L(iLayer) &...
-%                 statLonRange(:,1)<MLT(iZone) & statLonRange(:,2)>MLT(iZone));
-%             if isempty(iLMLT) || statnData(iLMLT)<=1
-%                 Density(iZone,iLayer) = yPred*nanmean(statStd(iL)) + nanmean(statMean(iL));
-%             else
-%                 Density(iZone,iLayer) = yPred*statStd(iLMLT) + statMean(iLMLT);
-%             end
-            Density(iZone,iLayer) = yPred*nanmean(statStd(iL)) + nanmean(statMean(iL));
-        else
-            Density(iZone,iLayer) = yPred;
-        end
+        Density(iZone,iLayer) = yPred(2) - yPred(1);
     end
 end
 %
@@ -140,29 +138,9 @@ patch(x,y,[0,0,0]);
 x=cos((90:270)*pi/180);
 y=sin((90:270)*pi/180);
 patch(x,y,[1,1,1]);
-caxis([0,4]);
+caxis([-1,1]);
 h=colorbar;
 myMap = jet;
-
-% readjust scales of jet map:
-myMap((256-32*2):256, 1) = linspace(1,0.75,32*2+1);
-myMap((256-32*2):256, 2) = 0;
-myMap((256-32*2):256, 3) = 0;
-
-myMap((256-32*3):(256-32*2), 1) = 1;
-myMap((256-32*3):(256-32*2), 2) = linspace(0.5,0,32*1+1);
-
-myMap((256-32*5):(256-32*3), 1) = 1;
-myMap((256-32*5):(256-32*3), 2) = linspace(1,0.5,32*2+1);
-myMap((256-32*5):(256-32*3), 3) = 0;
-
-myMap((256-32*6):(256-32*5), 1) = linspace(0,1,32*1+1);
-myMap((256-32*6):(256-32*5), 2) = 1;
-myMap((256-32*6):(256-32*5), 3) = linspace(1,0,32*1+1);
-
-myMap(1:(256-32*6), 1) = 0;
-myMap(1:(256-32*6), 2) = linspace(0,1,64);
-myMap(1:(256-32*6), 3) = 1;
 
 colormap(myMap);
 ylabel(h,'Log(density)');
