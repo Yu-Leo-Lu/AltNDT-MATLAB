@@ -203,6 +203,8 @@ end
 
 axis off
 title(titleStr);
+ax = gca;
+ax.TitleFontSizeMultiplier  = 2;
 % title(['Predicted Plasma Density Data ', titleStr]);
 
 return

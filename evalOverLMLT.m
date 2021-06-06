@@ -50,16 +50,17 @@ ndtLM = load(fullfile(dir,'results','trainlm','ndt_40eps.mat'));
 ndtPolarLM = load(fullfile(dir, 'results','trainlm', 'ndt_40eps_polarMLT.mat'));
 ndtStatLPolarLM = load(fullfile(dir, 'results','trainlm', 'ndt_40eps_scaledStatLPolarMLT.mat'));
 ndtStatWeightLPolarLM = load(fullfile(dir, 'results','trainlm', 'ndt_40eps_statLscaledWeightedPolarMLT'));
+
 % ----------------- Principal Component plot -----------------
-[X1, X3]=loadSampleX(0.1);
-X1StdTitle=X1{1}; X1Std31=X1{2}; X1Std30=X1{3};
+[XP1, X3]=loadSampleX(0.1);
+XP1StdTitle=XP1{1}; XP1Std31=XP1{2}; XP1Std30=XP1{3};
 X3StdTitle=X3{1}; X3Std31=X3{2}; X3Std30=X3{3};
 
 % ------------------- debugging -------------------
 iPC = 1;
 figure; 
 % subplot(3,1,1);
-VisualizePcaByWeights(ndtStatWeightLPolarLM.ndt,inputLabels,X1Std31{iPC+1},...
+VisualizePcaByWeights(ndtStatWeightLPolarLM.ndt,inputLabels,XP1Std31{iPC+1},...
         12,72,ndtStatWeightLPolarLM.procFcnsInput,ndtStatWeightLPolarLM.settingsXTrain,ndtStatWeightLPolarLM.Stat,'',[],1)
 % subplot(3,1,2);
 % VisualizePredictionPlasmaSphere(ndtStatLPolarLM.ndt,inputLabels,xTry,...
@@ -80,18 +81,18 @@ figure;
 for iPC = 1:5
     for j = 1:2
             subplot(4,5,iPC);
-            VisualizePcaByWeights(ndtStatWeightLPolarLM.ndt,inputLabels,X1Std31{iPC+1}(1,:),...
+            VisualizePcaByWeights(ndtStatWeightLPolarLM.ndt,inputLabels,XP1Std31{iPC+1}(1,:),...
                 12,72,ndtStatWeightLPolarLM.procFcnsInput,ndtStatWeightLPolarLM.settingsXTrain,ndtStatWeightLPolarLM.Stat,['PC', num2str(iPC)],[],0)
             subplot(4,5,iPC+5);
-             VisualizePcaByWeights(ndtStatWeightLPolarLM.ndt,inputLabels,X1Std31{iPC+1}(2,:),...
+             VisualizePcaByWeights(ndtStatWeightLPolarLM.ndt,inputLabels,XP1Std31{iPC+1}(2,:),...
                 12,72,ndtStatWeightLPolarLM.procFcnsInput,ndtStatWeightLPolarLM.settingsXTrain,ndtStatWeightLPolarLM.Stat,'',[],0)
     end
     for j = 1:2
             subplot(4,5,iPC+10);
-            VisualizePca(nn45LM.nn45,inputLabelsGnl,X1Std30{iPC+1}(1,:),...
+            VisualizePca(nn45LM.nn45,inputLabelsGnl,XP1Std30{iPC+1}(1,:),...
                 12,72,nn45LM.procFcnsInput,nn45LM.settingsXTrain,[],'',[],0)
             subplot(4,5,iPC+15);
-            VisualizePca(nn45LM.nn45,inputLabelsGnl,X1Std30{iPC+1}(2,:),...
+            VisualizePca(nn45LM.nn45,inputLabelsGnl,XP1Std30{iPC+1}(2,:),...
                 12,72,nn45LM.procFcnsInput,nn45LM.settingsXTrain,[],'',[],0)
     end
 end
@@ -101,26 +102,26 @@ figure;
 for iPC = 1:5
     for j = 1:2
             subplot(6,5,iPC);
-            VisualizePcaByWeights(ndtStatWeightLPolarLM.ndt,inputLabels,X1Std31{iPC+1}(1,:),...
+            VisualizePcaByWeights(ndtStatWeightLPolarLM.ndt,inputLabels,XP1Std31{iPC+1}(1,:),...
                 12,72,ndtStatWeightLPolarLM.procFcnsInput,ndtStatWeightLPolarLM.settingsXTrain,ndtStatWeightLPolarLM.Stat,['PC', num2str(iPC)],[],0)
             subplot(6,5,iPC+5);
-             VisualizePcaByWeights(ndtStatWeightLPolarLM.ndt,inputLabels,X1Std31{iPC+1}(2,:),...
+             VisualizePcaByWeights(ndtStatWeightLPolarLM.ndt,inputLabels,XP1Std31{iPC+1}(2,:),...
                 12,72,ndtStatWeightLPolarLM.procFcnsInput,ndtStatWeightLPolarLM.settingsXTrain,ndtStatWeightLPolarLM.Stat,'',[],0)
     end
     for j = 1:2
             subplot(6,5,iPC+10);
-            VisualizePca(ndtStatLPolarLM.ndt,inputLabels,X1Std31{iPC+1}(1,:),...
+            VisualizePca(ndtStatLPolarLM.ndt,inputLabels,XP1Std31{iPC+1}(1,:),...
                 12,72,ndtStatLPolarLM.procFcnsInput,ndtStatLPolarLM.settingsXTrain,ndtStatLPolarLM.Stat,'',[],0)
             subplot(6,5,iPC+15);
-             VisualizePca(ndtStatLPolarLM.ndt,inputLabels,X1Std31{iPC+1}(2,:),...
+             VisualizePca(ndtStatLPolarLM.ndt,inputLabels,XP1Std31{iPC+1}(2,:),...
                 12,72,ndtStatLPolarLM.procFcnsInput,ndtStatLPolarLM.settingsXTrain,ndtStatLPolarLM.Stat,'',[],0)
     end
     for j = 1:2
             subplot(6,5,iPC+20);
-            VisualizePca(ndtPolarLM.ndt,inputLabels,X1Std31{iPC+1}(1,:),...
+            VisualizePca(ndtPolarLM.ndt,inputLabels,XP1Std31{iPC+1}(1,:),...
                 12,72,ndtPolarLM.procFcnsInput,ndtPolarLM.settingsXTrain,[],'',[],0)
             subplot(6,5,iPC+25);
-             VisualizePca(ndtPolarLM.ndt,inputLabels,X1Std31{iPC+1}(2,:),...
+             VisualizePca(ndtPolarLM.ndt,inputLabels,XP1Std31{iPC+1}(2,:),...
                 12,72,ndtPolarLM.procFcnsInput,ndtPolarLM.settingsXTrain,[],'',[],0)
     end
 end
