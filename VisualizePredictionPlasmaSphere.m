@@ -144,7 +144,7 @@ caxis([0,4]);
 h=colorbar;
 myMap = jet;
 
-% readjust scales of jet map:
+% readjust scales of jet map if needed
 myMap((256-32*2):256, 1) = linspace(1,0.75,32*2+1);
 myMap((256-32*2):256, 2) = 0;
 myMap((256-32*2):256, 3) = 0;
@@ -160,6 +160,10 @@ myMap((256-32*6):(256-32*5), 1) = linspace(0,1,32*1+1);
 myMap((256-32*6):(256-32*5), 2) = 1;
 myMap((256-32*6):(256-32*5), 3) = linspace(1,0,32*1+1);
 
+% ---------------- color differences ----------------
+% uncomment either 1 or 2
+
+% 1. leave some white color when density close to 0
 myMap((256-32*7-16):(256-32*6), 1) = 0;
 myMap((256-32*7-16):(256-32*6), 2) = linspace(0,1,32*1+1+16);
 myMap((256-32*7-16):(256-32*6), 3) = 1;
@@ -171,6 +175,13 @@ myMap(9:16, 3) = 1;
 myMap(1:8, 1) = 1;
 myMap(1:8, 2) = 1;
 myMap(1:8, 3) = 1;
+
+% 2. continue blue color when density close to 0
+% myMap(1:(256-32*6), 1) = 0;
+% myMap(1:(256-32*6), 2) = linspace(0,1,64);
+% myMap(1:(256-32*6), 3) = 1;
+
+% ---------------- End of color differences ----------------
 
 % % update blue to white at the end of color bar
 % b2w = 31;
@@ -215,6 +226,8 @@ end
 
 axis off
 title(titleStr);
+ax = gca;
+ax.TitleFontSizeMultiplier  = 1.6;
 % title(['Predicted Plasma Density Data ', titleStr]);
 
 return

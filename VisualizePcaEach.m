@@ -1,4 +1,4 @@
-function VisualizePredictionPlasmaSphereByWeights(NeuralNet,ParameterLabels,EnvironParam,nLayer,nZone,procFcnsInput,settingsXTrain,Stat,titleStr,Transition,isColorBar)
+function VisualizePcaEach(NeuralNet,ParameterLabels,EnvironParam,nLayer,nZone,procFcnsInput,settingsXTrain,Stat,titleStr,Transition,isColorBar)
 %
 % Description: Generate a 2D polar plot of electron density in the
 %      plasmasphere predicted by a neural network.
@@ -24,6 +24,13 @@ if isempty(titleStr)
     titleStr = '';
 end
 
+% if the model is Stat scaled:
+if ~isempty(Stat)
+    statMean = [Stat.DensityMean];
+    statStd = [Stat.DensitySTD];
+    statLRange = [Stat.LRange]';
+end
+            
 Density=NaN(nZone,nLayer);
 L=1+5*[0.5:1:nLayer-0.5]/nLayer;
 % MLT: 0-360 in degree
@@ -36,41 +43,45 @@ if isempty(indMLT)
 end
 NNParam=zeros(1, length(ParameterLabels));
 
-statLRange = [Stat.LRange]';
-statMean = [Stat.DensityMean];
-statStd = [Stat.DensitySTD];
-statWeight = [Stat.ringWeight];
+%
 % Evaluate electron density
+%
 for iLayer=1:nLayer
     for iZone=1:nZone
-        for k=1:length(ParameterLabels)
-            switch ParameterLabels{k}
-                case 'l'
-                    NNParam(k)=L(iLayer);
-                case 'mlt'
-                    % why /15? convert MLT from degree 0-360 to time 0-24
-                    NNParam(k)=MLT(iZone)/15;
-                case 'smlt'
-                    NNParam(k)=sin(MLT(iZone)*pi/180);
-                case 'cmlt'
-                    NNParam(k)=cos(MLT(iZone)*pi/180);
-                otherwise
-                    NNParam(k)=EnvironParam(k);
+            for k=1:length(ParameterLabels)
+                switch ParameterLabels{k}
+                    case 'l'
+                        NNParam(k)=L(iLayer);
+                    case 'mlt'
+                        % why /15? convert MLT from degree 0-360 to time 0-24
+                        NNParam(k)=MLT(iZone)/15;
+                    case 'smlt'
+                        NNParam(k)=sin(MLT(iZone)*pi/180);
+                    case 'cmlt'
+                        NNParam(k)=cos(MLT(iZone)*pi/180);
+                    otherwise
+                        NNParam(k)=EnvironParam(k);
+                end
             end
-        end
-        NNParam = preProcessApply(NNParam, procFcnsInput, settingsXTrain);
-        
-        try
-            % by SGD
-            yPred=predict(NeuralNet,NNParam);
-        catch
-            % by LM
-            yPred = NeuralNet(NNParam');
-        end
-        % model is weighted, then stat scaled:
-        iL = find(statLRange(:,1)<L(iLayer) & statLRange(:,2)>L(iLayer));
-        yPred = yPred*nanmean(statStd(iL))*nanmean(statWeight(iL)) + nanmean(statMean(iL));
-        Density(iZone,iLayer) = yPred;
+            
+            NNParam = preProcessApply(NNParam, procFcnsInput, settingsXTrain);
+            
+            try
+                % by SGD
+                yPred = predict(NeuralNet,NNParam);
+            catch
+                % by LM
+                yPred = NeuralNet(NNParam');
+            end
+            
+            % if the model is Stat scaled:
+            if ~isempty(Stat)
+                iL = find(statLRange(:,1)<L(iLayer) & statLRange(:,2)>L(iLayer));
+                yPred = yPred*nanmean(statStd(iL)) + nanmean(statMean(iL));  
+            end
+ 
+            Density(iZone,iLayer) = yPred;
+
     end
 end
 %
@@ -131,63 +142,6 @@ caxis([0,4]);
 h=colorbar;
 myMap = jet;
 
-% readjust scales of jet map if needed
-myMap((256-32*2):256, 1) = linspace(1,0.75,32*2+1);
-myMap((256-32*2):256, 2) = 0;
-myMap((256-32*2):256, 3) = 0;
-
-myMap((256-32*3):(256-32*2), 1) = 1;
-myMap((256-32*3):(256-32*2), 2) = linspace(0.5,0,32*1+1);
-
-myMap((256-32*5):(256-32*3), 1) = 1;
-myMap((256-32*5):(256-32*3), 2) = linspace(1,0.5,32*2+1);
-myMap((256-32*5):(256-32*3), 3) = 0;
-
-myMap((256-32*6):(256-32*5), 1) = linspace(0,1,32*1+1);
-myMap((256-32*6):(256-32*5), 2) = 1;
-myMap((256-32*6):(256-32*5), 3) = linspace(1,0,32*1+1);
-
-% ---------------- color differences ----------------
-% uncomment either 1 or 2
-
-% 1. leave some white color when density close to 0
-myMap((256-32*7-16):(256-32*6), 1) = 0;
-myMap((256-32*7-16):(256-32*6), 2) = linspace(0,1,32*1+1+16);
-myMap((256-32*7-16):(256-32*6), 3) = 1;
-
-myMap(9:16, 1) = linspace(1,0,8);
-myMap(9:16, 2) = linspace(1,0,8);
-myMap(9:16, 3) = 1;
-
-myMap(1:8, 1) = 1;
-myMap(1:8, 2) = 1;
-myMap(1:8, 3) = 1;
-
-% 2. continue blue color when density close to 0
-% myMap(1:(256-32*6), 1) = 0;
-% myMap(1:(256-32*6), 2) = linspace(0,1,64);
-% myMap(1:(256-32*6), 3) = 1;
-
-% ---------------- End of color differences ----------------
-
-% % update blue to white at the end of color bar
-% b2w = 31;
-% % update blue
-% myMap(1:b2w, 3) = linspace(1,myMap(b2w+1,3) ,b2w);
-% % update green
-% myMap(1:b2w, 1) = linspace(1,0,b2w);
-% % update red
-% myMap(1:b2w, 2) = linspace(1,0,b2w);
-
-% update yellow to cyan transition
-% 160 row is yellow 1,1,0
-% 96 row is cyan 0,1,1
-% there are 64 rows between them, 
-% update the last quater of 64 rows (16 rows) to grey
-% update the last quater of 16 grey rows to black
-% myMap(160-16:159, :) = 0.5;
-% myMap(160-8:160-4, :) = 0;
-
 colormap(myMap);
 ylabel(h,'Log(density)');
 axis off
@@ -213,8 +167,6 @@ end
 
 axis off
 title(titleStr);
-ax = gca;
-ax.TitleFontSizeMultiplier  = 1.6;
 % title(['Predicted Plasma Density Data ', titleStr]);
 
 return

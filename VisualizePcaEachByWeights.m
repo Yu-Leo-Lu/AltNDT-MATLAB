@@ -1,4 +1,4 @@
-function VisualizePredictionPlasmaSphereByWeights(NeuralNet,ParameterLabels,EnvironParam,nLayer,nZone,procFcnsInput,settingsXTrain,Stat,titleStr,Transition,isColorBar)
+function VisualizePcaEachByWeights(NeuralNet,ParameterLabels,EnvironParam,nLayer,nZone,procFcnsInput,settingsXTrain,Stat,titleStr,Transition,isColorBar)
 %
 % Description: Generate a 2D polar plot of electron density in the
 %      plasmasphere predicted by a neural network.
@@ -34,6 +34,7 @@ if isempty(indMLT)
     indSML=find(strcmp(ParameterLabels,'smlt')==1);
     indCML=find(strcmp(ParameterLabels,'cmlt')==1);
 end
+
 NNParam=zeros(1, length(ParameterLabels));
 
 statLRange = [Stat.LRange]';
@@ -58,8 +59,8 @@ for iLayer=1:nLayer
                     NNParam(k)=EnvironParam(k);
             end
         end
+
         NNParam = preProcessApply(NNParam, procFcnsInput, settingsXTrain);
-        
         try
             % by SGD
             yPred=predict(NeuralNet,NNParam);
@@ -70,6 +71,7 @@ for iLayer=1:nLayer
         % model is weighted, then stat scaled:
         iL = find(statLRange(:,1)<L(iLayer) & statLRange(:,2)>L(iLayer));
         yPred = yPred*nanmean(statStd(iL))*nanmean(statWeight(iL)) + nanmean(statMean(iL));
+        
         Density(iZone,iLayer) = yPred;
     end
 end
@@ -131,62 +133,25 @@ caxis([0,4]);
 h=colorbar;
 myMap = jet;
 
-% readjust scales of jet map if needed
-myMap((256-32*2):256, 1) = linspace(1,0.75,32*2+1);
-myMap((256-32*2):256, 2) = 0;
-myMap((256-32*2):256, 3) = 0;
-
-myMap((256-32*3):(256-32*2), 1) = 1;
-myMap((256-32*3):(256-32*2), 2) = linspace(0.5,0,32*1+1);
-
-myMap((256-32*5):(256-32*3), 1) = 1;
-myMap((256-32*5):(256-32*3), 2) = linspace(1,0.5,32*2+1);
-myMap((256-32*5):(256-32*3), 3) = 0;
-
-myMap((256-32*6):(256-32*5), 1) = linspace(0,1,32*1+1);
-myMap((256-32*6):(256-32*5), 2) = 1;
-myMap((256-32*6):(256-32*5), 3) = linspace(1,0,32*1+1);
-
-% ---------------- color differences ----------------
-% uncomment either 1 or 2
-
-% 1. leave some white color when density close to 0
-myMap((256-32*7-16):(256-32*6), 1) = 0;
-myMap((256-32*7-16):(256-32*6), 2) = linspace(0,1,32*1+1+16);
-myMap((256-32*7-16):(256-32*6), 3) = 1;
-
-myMap(9:16, 1) = linspace(1,0,8);
-myMap(9:16, 2) = linspace(1,0,8);
-myMap(9:16, 3) = 1;
-
-myMap(1:8, 1) = 1;
-myMap(1:8, 2) = 1;
-myMap(1:8, 3) = 1;
-
-% 2. continue blue color when density close to 0
+% readjust scales of jet map:
+% myMap((256-32*2):256, 1) = linspace(1,0.75,32*2+1);
+% myMap((256-32*2):256, 2) = 0;
+% myMap((256-32*2):256, 3) = 0;
+% 
+% myMap((256-32*3):(256-32*2), 1) = 1;
+% myMap((256-32*3):(256-32*2), 2) = linspace(0.5,0,32*1+1);
+% 
+% myMap((256-32*5):(256-32*3), 1) = 1;
+% myMap((256-32*5):(256-32*3), 2) = linspace(1,0.5,32*2+1);
+% myMap((256-32*5):(256-32*3), 3) = 0;
+% 
+% myMap((256-32*6):(256-32*5), 1) = linspace(0,1,32*1+1);
+% myMap((256-32*6):(256-32*5), 2) = 1;
+% myMap((256-32*6):(256-32*5), 3) = linspace(1,0,32*1+1);
+% 
 % myMap(1:(256-32*6), 1) = 0;
 % myMap(1:(256-32*6), 2) = linspace(0,1,64);
 % myMap(1:(256-32*6), 3) = 1;
-
-% ---------------- End of color differences ----------------
-
-% % update blue to white at the end of color bar
-% b2w = 31;
-% % update blue
-% myMap(1:b2w, 3) = linspace(1,myMap(b2w+1,3) ,b2w);
-% % update green
-% myMap(1:b2w, 1) = linspace(1,0,b2w);
-% % update red
-% myMap(1:b2w, 2) = linspace(1,0,b2w);
-
-% update yellow to cyan transition
-% 160 row is yellow 1,1,0
-% 96 row is cyan 0,1,1
-% there are 64 rows between them, 
-% update the last quater of 64 rows (16 rows) to grey
-% update the last quater of 16 grey rows to black
-% myMap(160-16:159, :) = 0.5;
-% myMap(160-8:160-4, :) = 0;
 
 colormap(myMap);
 ylabel(h,'Log(density)');
@@ -213,8 +178,6 @@ end
 
 axis off
 title(titleStr);
-ax = gca;
-ax.TitleFontSizeMultiplier  = 1.6;
 % title(['Predicted Plasma Density Data ', titleStr]);
 
 return
