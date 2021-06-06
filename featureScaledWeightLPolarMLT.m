@@ -23,7 +23,9 @@ yTest = Density(testIdx);
 Stat=getPlasmaSphereStatsL(LTrain,yTrain);
 % VisualizePlasmaSPhereStats(Stat)
 
-% add ring area density and weight to Stat
+% ------------------- Stat standardized then weighted -------------------
+% scale training output Density by cell mean and std
+dropIdx = [];
 for iCell = 1:length(Stat)
     ind=find((LTrain>=Stat(iCell).LRange(1))&(LTrain<Stat(iCell).LRange(2)));
     ringMean = Stat(iCell).DensityMean;
@@ -34,20 +36,7 @@ for iCell = 1:length(Stat)
         ringArea = pi*(max(XTrain(:,5))^2 - Stat(iCell).LRange(1)^2);
     end
     ringDensity = Stat(iCell).nDataPoint/ringArea;
-    ringWeight = sqrt(ringDensity)/100;
-    Stat(iCell).ringArea = ringArea;
-    Stat(iCell).ringDensity = ringDensity;
-    Stat(iCell).ringWeight = ringWeight;
-end
-
-% ------------------- Stat standardized then weighted -------------------
-% scale training output Density by cell mean and std
-dropIdx = [];
-for iCell = 1:length(Stat)
-    ind=find((LTrain>=Stat(iCell).LRange(1))&(LTrain<Stat(iCell).LRange(2)));
-    ringMean = Stat(iCell).DensityMean;
-    ringStd = Stat(iCell).DensitySTD;
-    ringWeight =  Stat(iCell).ringWeight;
+    ringWeight = sqrt(ringDensity)/10;
     if length(ind) <=1
         dropIdx = union(dropIdx, ind);
     else
@@ -65,7 +54,13 @@ for iCell = 1:length(Stat)
     ind=find((LTest>=Stat(iCell).LRange(1))&(LTest<Stat(iCell).LRange(2)));
     ringMean = Stat(iCell).DensityMean;
     ringStd = Stat(iCell).DensitySTD;
-    ringWeight = Stat(iCell).ringWeight;
+    if Stat(iCell).LRange(2)~= inf
+        ringArea = pi*(Stat(iCell).LRange(2)^2 - Stat(iCell).LRange(1)^2);
+    else
+        ringArea = pi*(max(XTrain(:,5))^2 - Stat(iCell).LRange(1)^2);
+    end
+    ringDensity = Stat(iCell).nDataPoint/ringArea;
+    ringWeight = sqrt(ringDensity)/10;
     yTest(ind) = (DensityTest(ind) - ringMean)/(ringStd*ringWeight);
 end
 

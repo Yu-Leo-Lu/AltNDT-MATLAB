@@ -37,9 +37,10 @@ end
 NNParam=zeros(1, length(ParameterLabels));
 
 statLRange = [Stat.LRange]';
+statnDataPoint = sqrt([Stat.nDataPoint])/100;
 statMean = [Stat.DensityMean];
 statStd = [Stat.DensitySTD];
-statWeight = [Stat.ringWeight];
+
 % Evaluate electron density
 for iLayer=1:nLayer
     for iZone=1:nZone
@@ -69,7 +70,7 @@ for iLayer=1:nLayer
         end
         % model is weighted, then stat scaled:
         iL = find(statLRange(:,1)<L(iLayer) & statLRange(:,2)>L(iLayer));
-        yPred = yPred*nanmean(statStd(iL))*nanmean(statWeight(iL)) + nanmean(statMean(iL));
+        yPred = yPred*nanmean(statStd(iL))*nanmean(statnDataPoint(iL)) + nanmean(statMean(iL));
         Density(iZone,iLayer) = yPred;
     end
 end
