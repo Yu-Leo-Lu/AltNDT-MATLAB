@@ -58,6 +58,16 @@ disp('-------------------- PINE SGD ends --------------------')
 % save(fullfile(dir, 'results', names), 'nn45', 'nn45Info',...
 %     'procFcnsInput', 'settingsXTrain')
 
+disp('-------------------- PINE Adam starts --------------------')
+maxEps = 50
+tic; nn45SGD; toc;
+disp('-------------------- PINE Adam ends --------------------')
+
+names = sprintf('nn45_50eps_lr1e-2_bs10000_beta1_9e-1_beta2_9e-1.mat');
+
+save(fullfile(dir, 'results', names), 'nn45', 'nn45Info',...
+    'procFcnsInput', 'settingsXTrain')
+
 % -------------------------LM training-------------------------------------
 % call ndtLM:
 % ndtLM
