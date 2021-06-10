@@ -38,6 +38,11 @@ disp('-------------------- ndt SGD ends --------------------')
 %     'procFcnsInput', 'settingsXTrain')
 
 % Adam saving
+disp('-------------------- ndt Adam starts --------------------')
+MaxNumSplits = 25;
+maxEps = 20;
+tic; ndtSGD; toc;
+disp('-------------------- ndt Adam ends --------------------')
 % names = sprintf('ndtAdam_50eps_lr1e-2_bs10000_beta1_9e-1_beta2_9e-1.mat');
 % save(fullfile(dir, 'results','testModel', names), 'ndt', 'ndtInfo',...
 %      'procFcnsInput', 'settingsXTrain')
@@ -57,6 +62,7 @@ disp('-------------------- PINE SGD ends --------------------')
 % call ndtLM:
 % ndtLM
 disp('-------------------- ndt LM starts --------------------')
+MaxNumSplits = 10
 tic; ndtLM; toc;
 disp('-------------------- ndt LM ends --------------------')
 

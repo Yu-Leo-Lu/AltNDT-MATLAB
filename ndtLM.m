@@ -7,7 +7,7 @@ tp2(trainIdx) = yTrain; tp2(testIdx,:) = yTest;
 tp2 = tp2';
 
 % MaxNumSplits = 15, 25
-MaxNumSplits = 25;
+% MaxNumSplits = 25;
 
 % initialize NDT
 [W0,b0,W1,b1,W2,b2,tree,error_check,K] = initAllWb(Xp2(:,trainIdx)',tp2(:,trainIdx)',MaxNumSplits);
