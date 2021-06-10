@@ -79,6 +79,7 @@ yndt_train = ndt(Xp2(:,trainIdx));
 
 %train NDT
 ndt.trainParam.epochs = 40;
+% ndt.trainParam.epochs = 10;
 
 [ndt, ndtInfo] = train(ndt, Xp2, tp2);
 

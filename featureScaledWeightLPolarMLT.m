@@ -34,7 +34,7 @@ for iCell = 1:length(Stat)
         ringArea = pi*(max(XTrain(:,5))^2 - Stat(iCell).LRange(1)^2);
     end
     ringDensity = Stat(iCell).nDataPoint/ringArea;
-    ringWeight = sqrt(ringDensity)/100;
+    ringWeight = sqrt(ringDensity)/1;
     Stat(iCell).ringArea = ringArea;
     Stat(iCell).ringDensity = ringDensity;
     Stat(iCell).ringWeight = ringWeight;
@@ -111,7 +111,7 @@ XTest = preProcessApply(XTest, procFcnsInput, settingsXTrain);
 
 % call ndtLM:
 ndtLM
-names = sprintf('ndt_40eps_statLscaledWeightedByDensityPolarMLT.mat');
+names = sprintf('ndt_40eps_statLscaledWeightedByDensity1PolarMLT.mat');
 save(fullfile(dir, 'results', 'trainlm', names), 'ndt', 'ndtInfo',...
     'procFcnsInput', 'settingsXTrain', 'Stat')
 

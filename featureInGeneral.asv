@@ -23,15 +23,15 @@ yTest = Density(testIdx);
 % -------------------------SGD training------------------------------------
 % call ndgSGD:
 ndtSGD
+names = sprintf('ndt_200eps_lr1e-1_bs10000_mmt1e-1_tnoproc.mat');
+save(fullfile(dir, 'results', names), 'ndt', 'ndtInfo',...
+    'procFcnsInput', 'settingsXTrain')
 
 % fig = findall(groot,'Type','Figure');
 % saveas(fig, fullfile(dir, 'figures', 'ndtTrainTest_lr_1e-1'));
 
 % SGD saving
-names = sprintf('ndt_200eps_lr1e-1_bs10000_mmt1e-1_tnoproc.mat');
 
-save(fullfile(dir, 'results', names), 'ndt', 'ndtInfo',...
-    'procFcnsInput', 'settingsXTrain')
 
 % Adam saving
 % names = sprintf('ndtAdam_50eps_lr1e-2_bs10000_beta1_9e-1_beta2_9e-1.mat');

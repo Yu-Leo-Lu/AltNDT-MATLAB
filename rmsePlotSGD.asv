@@ -1,0 +1,21 @@
+function rmsePlotSGD(ndtSGD, nn45SGD)
+% Zoom in box plot for performance comparison between NDT and NN45
+
+iterNdt = 1:numel(ndtSGD.ndtInfo.TrainingLoss);
+iterNN45 = 1:numel(nn45SGD.nn45Info.TrainingLoss);
+TrainingLossNdtSgd = ndtSGD.ndtInfo.TrainingLoss;
+TestingLossNdtSgd = 
+figure
+hold on
+plot(iterNdt, ndtSGD.ndtInfo.TrainingLoss,'--','Color','#D95319','LineWidth',2) %default color2
+plot(iterNdt, ndtSGD.ndtInfo.ValidationLoss,'*-','Color','#D95319','LineWidth',2)
+plot(iterNN45, nn45SGD.nn45Info.TrainingLoss,'--','Color','#EDB120','LineWidth',2) %default color3
+plot(iterNN45, nn45SGD.nn45Info.ValidationLoss,'*-','Color','#EDB120','LineWidth',2)
+% legend('Tree,train','Tree,test','NDT,train','NDT,test','NN45,train','NN45,test')
+legend('NDT SGD, train','NDT SGD, test','PINE SGD, train','PINE SGD, test')
+xlabel('Epochs')
+ylabel('RMSE')
+title('Performance Comparison in RMSE')
+
+
+end

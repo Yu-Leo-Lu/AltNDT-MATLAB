@@ -9,3 +9,8 @@ c=get(gcf, 'children')
 for i = 1:length(c)
     set(c(i), 'TitleFontSizeMultiplier', 2.5)
 end
+
+c=get(gcf, 'children')
+for i = 1:length(c)
+    c(i).CLim = [-1,1];
+end

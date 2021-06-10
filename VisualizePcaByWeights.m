@@ -24,7 +24,11 @@ if isempty(titleStr)
     titleStr = '';
 end
 
-Density=NaN(nZone,nLayer);
+DensityMinus=NaN(nZone,nLayer);
+DensityPlus=NaN(nZone,nLayer);
+rowMinus = 1;
+rowPlus = 2;
+
 L=1+5*[0.5:1:nLayer-0.5]/nLayer;
 % MLT: 0-360 in degree
 MLT=360*[0.5:1:nZone-0.5]/nZone;
@@ -34,48 +38,86 @@ if isempty(indMLT)
     indSML=find(strcmp(ParameterLabels,'smlt')==1);
     indCML=find(strcmp(ParameterLabels,'cmlt')==1);
 end
-NNParam=zeros(2, length(ParameterLabels));
-yPred=zeros(2,1);
+NNParam=zeros(1, length(ParameterLabels));
 
 statLRange = [Stat.LRange]';
 statMean = [Stat.DensityMean];
 statStd = [Stat.DensitySTD];
 statWeight = [Stat.ringWeight];
-% Evaluate electron density
+%
+% Evaluate electron density, for minus std input
+%
 for iLayer=1:nLayer
     for iZone=1:nZone
-        for iRow = 1:2
-            for k=1:length(ParameterLabels)
-                switch ParameterLabels{k}
-                    case 'l'
-                        NNParam(iRow,k)=L(iLayer);
-                    case 'mlt'
-                        % why /15? convert MLT from degree 0-360 to time 0-24
-                        NNParam(iRow,k)=MLT(iZone)/15;
-                    case 'smlt'
-                        NNParam(iRow,k)=sin(MLT(iZone)*pi/180);
-                    case 'cmlt'
-                        NNParam(iRow,k)=cos(MLT(iZone)*pi/180);
-                    otherwise
-                        NNParam(iRow,k)=EnvironParams(iRow,k);
-                end
+        for k=1:length(ParameterLabels)
+            switch ParameterLabels{k}
+                case 'l'
+                    NNParam(k)=L(iLayer);
+                case 'mlt'
+                    % why /15? convert MLT from degree 0-360 to time 0-24
+                    NNParam(k)=MLT(iZone)/15;
+                case 'smlt'
+                    NNParam(k)=sin(MLT(iZone)*pi/180);
+                case 'cmlt'
+                    NNParam(k)=cos(MLT(iZone)*pi/180);
+                otherwise
+                    NNParam(k)=EnvironParams(rowMinus,k);
             end
-            
-            NNParam(iRow,:) = preProcessApply(NNParam(iRow,:), procFcnsInput, settingsXTrain);
-            try
-                % by SGD
-                yPred(iRow)=predict(NeuralNet,NNParam(iRow,:));
-            catch
-                % by LM
-                yPred(iRow) = NeuralNet(NNParam(iRow,:)');
-            end
-            % model is weighted, then stat scaled:
-            iL = find(statLRange(:,1)<L(iLayer) & statLRange(:,2)>L(iLayer));
-            yPred(iRow) = yPred(iRow)*nanmean(statStd(iL))*nanmean(statWeight(iL)) + nanmean(statMean(iL));
         end
-        Density(iZone,iLayer) = yPred(2)-yPred(1);
+        
+        NNParam= preProcessApply(NNParam, procFcnsInput, settingsXTrain);
+        try
+            % by SGD
+            yPred=predict(NeuralNet,NNParam);
+        catch
+            % by LM
+            yPred = NeuralNet(NNParam');
+        end
+        % model is weighted, then stat scaled:
+        iL = find(statLRange(:,1)<L(iLayer) & statLRange(:,2)>L(iLayer));
+        yPred= yPred*nanmean(statStd(iL))*nanmean(statWeight(iL)) + nanmean(statMean(iL));
+        DensityMinus(iZone,iLayer) = yPred;
     end
 end
+%
+% Evaluate electron density, for plus std input
+%
+for iLayer=1:nLayer
+    for iZone=1:nZone
+        for k=1:length(ParameterLabels)
+            switch ParameterLabels{k}
+                case 'l'
+                    NNParam(k)=L(iLayer);
+                case 'mlt'
+                    % why /15? convert MLT from degree 0-360 to time 0-24
+                    NNParam(k)=MLT(iZone)/15;
+                case 'smlt'
+                    NNParam(k)=sin(MLT(iZone)*pi/180);
+                case 'cmlt'
+                    NNParam(k)=cos(MLT(iZone)*pi/180);
+                otherwise
+                    NNParam(k)=EnvironParams(rowPlus,k);
+            end
+        end
+        
+        NNParam= preProcessApply(NNParam, procFcnsInput, settingsXTrain);
+        try
+            % by SGD
+            yPred=predict(NeuralNet,NNParam);
+        catch
+            % by LM
+            yPred = NeuralNet(NNParam');
+        end
+        % model is weighted, then stat scaled:
+        iL = find(statLRange(:,1)<L(iLayer) & statLRange(:,2)>L(iLayer));
+        yPred= yPred*nanmean(statStd(iL))*nanmean(statWeight(iL)) + nanmean(statMean(iL));
+        DensityPlus(iZone,iLayer) = yPred;
+    end
+end
+
+Density = DensityMinus - DensityPlus;
+
+
 %
 % Define the polygons.
 %
@@ -155,7 +197,7 @@ myMap = jet;
 % myMap(1:(256-32*6), 3) = 1;
 
 colormap(myMap);
-ylabel(h,'Log(density)');
+ylabel(h,'Log(density) Difference');
 axis off
 
 if ~isempty(Transition)
@@ -179,6 +221,8 @@ end
 
 axis off
 title(titleStr);
+ax = gca;
+ax.TitleFontSizeMultiplier  = 1.6;
 % title(['Predicted Plasma Density Data ', titleStr]);
 
 return
