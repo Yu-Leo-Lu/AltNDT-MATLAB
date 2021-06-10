@@ -1,5 +1,5 @@
-% MaxNumSplits = 10,15,25
-MaxNumSplits = 25;
+s% MaxNumSplits = 25;
+
 [W0,b0,W1,b1,W2,b2,tree,error_check,NumSplits] = ...
     initAllWb(XTrain,yTrain,MaxNumSplits);
 

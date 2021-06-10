@@ -24,6 +24,7 @@ yTest = Density(testIdx);
 % call ndgSGD:
 % ndtSGD
 disp('-------------------- ndt SGD starts --------------------')
+MaxNumSplits = 15;
 tic; ndtSGD; toc;
 disp('-------------------- ndt SGD ends --------------------')
 
