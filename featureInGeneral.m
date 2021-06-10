@@ -22,16 +22,19 @@ yTest = Density(testIdx);
 
 % -------------------------SGD training------------------------------------
 % call ndgSGD:
-ndtSGD
+% ndtSGD
+disp('-------------------- ndt SGD starts --------------------')
+tic; ndtSGD; toc;
+disp('-------------------- ndt SGD ends --------------------')
 
 % fig = findall(groot,'Type','Figure');
 % saveas(fig, fullfile(dir, 'figures', 'ndtTrainTest_lr_1e-1'));
 
 % SGD saving
-names = sprintf('ndt_200eps_lr1e-1_bs10000_mmt1e-1_tnoproc.mat');
-
-save(fullfile(dir, 'results', names), 'ndt', 'ndtInfo',...
-    'procFcnsInput', 'settingsXTrain')
+% names = sprintf('ndt_200eps_lr1e-1_bs10000_mmt1e-1_tnoproc.mat');
+% 
+% save(fullfile(dir, 'results', names), 'ndt', 'ndtInfo',...
+%     'procFcnsInput', 'settingsXTrain')
 
 % Adam saving
 % names = sprintf('ndtAdam_50eps_lr1e-2_bs10000_beta1_9e-1_beta2_9e-1.mat');
@@ -41,6 +44,9 @@ save(fullfile(dir, 'results', names), 'ndt', 'ndtInfo',...
 
 % call nn45SGD:
 % nn45SGD
+disp('-------------------- PINE SGD starts --------------------')
+tic; nn45SGD; toc;
+disp('-------------------- PINE SGD ends --------------------')
 % names = sprintf('nn45_200eps_lr1e-1_bs10000_mmt1e-1_tnoproc.mat');
 % 
 % save(fullfile(dir, 'results', names), 'nn45', 'nn45Info',...
@@ -49,13 +55,19 @@ save(fullfile(dir, 'results', names), 'ndt', 'ndtInfo',...
 % -------------------------LM training-------------------------------------
 % call ndtLM:
 % ndtLM
+disp('-------------------- ndt LM starts --------------------')
+tic; ndtLM; toc;
+disp('-------------------- ndt LM ends --------------------')
+
 % names = sprintf('ndt10_40eps.mat');
 % save(fullfile(dir, 'results', 'trainlm', names), 'ndt', 'ndtInfo',...
 %     'procFcnsInput', 'settingsXTrain')
 
 % call nn45LM
 % nn45LM
-% 
+disp('-------------------- PINE LM starts --------------------')
+tic; nn45LM; toc;
+disp('-------------------- PINE LM ends --------------------')
 % names = sprintf('nn45_40eps_scaledStatLPolarMLT.mat');
 % save(fullfile(dir, 'results','trainlm', names), 'nn45', 'nn45Info',...
 %     'procFcnsInput', 'settingsXTrain', 'Stat')

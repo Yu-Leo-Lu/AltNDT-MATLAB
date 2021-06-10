@@ -1,40 +1,3 @@
-% startup
-% 
-% % load PINE data
-% [PINE,trainIdx, testIdx] = loadPINE();
-% MLT = PINE.data_all.X(:,6); 
-% X = PINE.data_all.X;
-% t = PINE.data_all.t;
-% 
-% % convert polar coord
-% polarMLT = zeros(size(MLT,1),2);
-% polarMLT(:,1) = cos(MLT*15*pi/180);
-% polarMLT(:,2) = sin(MLT*15*pi/180);
-% X = [PINE.data_all.X(:,1:5), polarMLT, PINE.data_all.X(:,7:end)];
-% 
-% % tree pre- and post- processing
-% % X = X'; t = t';
-% % procFcnsInput = {}; procFcnsOutput = {};
-% % procFcnsInput{1} = 'removeconstantrows'; procFcnsInput{2} = 'mapminmax';
-% % procFcnsOutput{1} = 'removeconstantrows'; procFcnsOutput{2} = 'removeconstantrows';
-% % [Xp1, Xs1] = feval(procFcnsInput{1},X);
-% % [Xp2, Xs2] = feval(procFcnsInput{2},Xp1);
-% % [tp1, ts1] = feval(procFcnsOutput{1},t);
-% % [tp2, ts2] = feval(procFcnsOutput{2},tp1);
-% 
-% 
-% %pre- and post- processing
-% procFcnsInput = {}; procFcnsOutput = {};
-% procFcnsInput{1} = 'removeconstantrows'; procFcnsInput{2} = 'mapminmax';
-% procFcnsOutput{1} = 'removeconstantrows'; 
-% % procFcnsOutput{2} = 'mapminmax';
-% 
-% [XTrain, settingsXTrain] = preProcess(X(trainIdx, :), procFcnsInput);
-% [yTrain, settingst] = preProcess(t(trainIdx, :), procFcnsOutput);
-% 
-% XTest = preProcessApply(X(testIdx, :),procFcnsInput,settingsXTrain);
-% yTest = preProcessApply(t(testIdx, :),procFcnsOutput,settingst);
-
 Xp2 = X;
 Xp2(trainIdx,:) = XTrain; Xp2(testIdx,:) = XTest;
 Xp2 = Xp2';
@@ -53,6 +16,8 @@ MaxNumSplits = 25;
 %     ytree_train = mapminmax('reverse', ytree_train, tPSrm);
 %     ytree_train = removeconstantrows('reverse', ytree_train, tPSr);
 %     mean((ytree_train-t(PINE.inds_train{k})).^2)
+
+maxEps = 4;
 
 ndt = feedforwardnet([K, K+1]);
 ndt.input.processFcns = {};
@@ -78,8 +43,7 @@ yndt_train = ndt(Xp2(:,trainIdx));
 % mean((ytree_train - yTrain').^2)
 
 %train NDT
-ndt.trainParam.epochs = 40;
-% ndt.trainParam.epochs = 10;
+ndt.trainParam.epochs = maxEps;
 
 [ndt, ndtInfo] = train(ndt, Xp2, tp2);
 
