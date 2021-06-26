@@ -11,6 +11,7 @@ ndt10 = load(fullfile(dir,'results','trainlm', 'ndt10_40eps'));
 ndtSGD = load(fullfile(dir,'results', 'ndt_200eps_lr1e-1_bs10000_mmt1e-1_tnoproc'));
 ndtAdam = load(fullfile(dir,'results','testModel', 'ndtAdam_50eps_lr1e-2_bs10000_beta1_9e-1_beta2_9e-1'));
 nn45SGD = load(fullfile(dir,'results', 'nn45_200eps_lr1e-1_bs10000_mmt1e-1_tnoproc'));
+nn45Adam = load(fullfile(dir,'results','testModel', 'nn45Adam_50eps_lr1e-2_bs10000_beta1_9e-1_beta2_9e-1'));
 
 [ndtAIC, ndtBIC] = infoCrit(ndtInfo.tperf(end), length(ndtInfo.trainInd), ...
     length(getwb(ndt.ndt)));
@@ -19,8 +20,8 @@ nn45SGD = load(fullfile(dir,'results', 'nn45_200eps_lr1e-1_bs10000_mmt1e-1_tnopr
 
 
 %---------------------- RMSE plot convergence SGD ----------------------
-rmsePlotSGD(ndtSGD, nn45SGD, 293)
-rmsePlotSGD(ndtAdam, nn45SGD, 293)
+rmsePlotSGD(ndtSGD, nn45SGD, 293,1:40, 'SGD')
+rmsePlotSGD(ndtAdam, nn45Adam, 293, 1:40, 'Adam')
 
 % ---------------------- load 2001 data ----------------------
 load(fullfile(dir, 'PINE_data', 'data2001'));
