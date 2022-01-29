@@ -13,11 +13,8 @@ ndtAdam = load(fullfile(dir,'results','testModel', 'ndtAdam_50eps_lr1e-2_bs10000
 nn45SGD = load(fullfile(dir,'results', 'nn45_200eps_lr1e-1_bs10000_mmt1e-1_tnoproc'));
 nn45Adam = load(fullfile(dir,'results','testModel', 'nn45Adam_50eps_lr1e-2_bs10000_beta1_9e-1_beta2_9e-1'));
 
-[ndtAIC, ndtBIC] = infoCrit(ndtInfo.tperf(end), length(ndtInfo.trainInd), ...
-    length(getwb(ndt.ndt)));
-[nn45AIC, nn45BIC] = infoCrit(nn45Info.tperf(end), length(nn45Info.trainInd), ...
-    length(getwb(nn45)));
-
+ndt_timeseq = load(fullfile(dir,'results','trainlm','TimeSeq','ndt25_40eps'));
+nn45_timeseq = load(fullfile(dir,'results','trainlm','TimeSeq', 'nn45_40eps'));
 
 %---------------------- RMSE plot convergence SGD ----------------------
 rmsePlotSGD(ndtSGD, nn45SGD, 293,1:40, 'SGD')
@@ -36,10 +33,24 @@ xTry = [xTryGnl(1:6),nan,xTryGnl(7:end)];
 % xTryH = [xTryGnlH(1:6),nan,xTryGnlH(7:end)];
 % xTryGstack = [xTryGnl;xTryGnlH];
 
-DateStrs = {'26-Jun-2001','26-Jun-2001','26-Jun-2001','27-Jun-2001','27-Jun-2001'};
-hrs = [11,19,22,00,11]; mins = [51,33,06,09,23];
+% 5 plots
+% DateStrs = {'26-Jun-2001','26-Jun-2001','26-Jun-2001','27-Jun-2001','27-Jun-2001'};
+% hrs = [11,19,22,00,11]; mins = [51,33,06,09,23];
+% xTryGnls = NaN(5,30); xTrys = NaN(5,31);
+% for i = 1:5
+%     DateStr = DateStrs{i}; hr = hrs(i); min = mins(i);
+%     days = datenum(DateStr) - datenum(2001,1,1);
+%     xTryGnl = data2001(days*24*60+hr*60+min,:);
+%     xTry = [xTryGnl(1:6),nan,xTryGnl(7:end)];
+%     xTryGnls(i,:) = xTryGnl; xTrys(i,:) = xTry;
+% end
+
+% 4 plots
+DateStrs = {'10-Jun-2001','28-May-2001','08-May-2001','20-Mar-2001'};
+hrs = [06,22,18,13]; mins = [33,17,24,59];
 xTryGnls = NaN(5,30); xTrys = NaN(5,31);
-for i = 1:5
+
+for i = 1:4
     DateStr = DateStrs{i}; hr = hrs(i); min = mins(i);
     days = datenum(DateStr) - datenum(2001,1,1);
     xTryGnl = data2001(days*24*60+hr*60+min,:);
@@ -48,7 +59,7 @@ for i = 1:5
 end
 
 % ----------------- NDT25, 15, 10 vs PINE on 2001 -----------------
-figure; 
+figure; % 5 plots
 for i = 1:5
     timeTitle=[DateStrs{i},' ',num2str(hrs(i),'%02.f'),':', num2str(mins(i),'%02.f')];
     subplot(4,5,i);
@@ -64,8 +75,29 @@ for i = 1:5
     VisualizePredictionPlasmaSphere(nn45.nn45,inputLabelsGnl,xTryGnls(i,:),...
         12,72,nn45.procFcnsInput,nn45.settingsXTrain,[],'',[],0)
 end
-
+% ----------------- NDT25, 15, 10 vs PINE on 2001 -----------------
+figure; % 4 plots
+for i = 1:4
+    timeTitle=[DateStrs{i},' ',num2str(hrs(i),'%02.f'),':', num2str(mins(i),'%02.f')];
+    subplot(4,4,i);
+    VisualizePredictionPlasmaSphere(ndt.ndt,inputLabelsGnl,xTryGnls(i,:),...
+        12,72,ndt.procFcnsInput,ndt.settingsXTrain,[],timeTitle,[],0)
+    subplot(4,4,i+4);
+    VisualizePredictionPlasmaSphere(ndt15.ndt,inputLabelsGnl,xTryGnls(i,:),...
+        12,72,ndt15.procFcnsInput,ndt15.settingsXTrain,[],'',[],0)
+    subplot(4,4,i+4*2);
+    VisualizePredictionPlasmaSphere(ndt10.ndt,inputLabelsGnl,xTryGnls(i,:),...
+        12,72,ndt10.procFcnsInput,ndt10.settingsXTrain,[],'',[],0)
+    subplot(4,4,i+4*3);
+    VisualizePredictionPlasmaSphere(nn45.nn45,inputLabelsGnl,xTryGnls(i,:),...
+        12,72,nn45.procFcnsInput,nn45.settingsXTrain,[],'',[],0)
+end
 % ---------------------- Evaluation ----------------------
+[ndtAIC, ndtBIC] = infoCrit(ndt.ndtInfo.tperf(end), length(ndtInfo.trainInd), ...
+    length(getwb(ndt.ndt)));
+[nn45AIC, nn45BIC] = infoCrit(ndt.nn45Info.tperf(end), length(nn45Info.trainInd), ...
+    length(getwb(nn45)));
+
 ynn45 = nn45(X(:,test_idx));
 yndt = ndt.ndt(X(:,test_idx));
 ytest = Density(test_idx);
@@ -102,6 +134,8 @@ rmsePlot(ndt10, nn45, 'NDT10')
 length(getwb(ndt10.ndt))
 length(getwb(nn45.nn45))
 
+% RMSE plot time sequential
+rmsePlot(ndt_timeseq, nn45_timeseq, 'NDT TimeSeq')
 
 % ---------------------- old plot ----------------------
 figure(4)

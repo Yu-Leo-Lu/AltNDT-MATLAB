@@ -17,7 +17,7 @@ tp2 = tp2';
 %     ytree_train = removeconstantrows('reverse', ytree_train, tPSr);
 %     mean((ytree_train-t(PINE.inds_train{k})).^2)
 
-maxEps = 4;
+maxEps = 40;
 
 ndt = feedforwardnet([K, K+1]);
 ndt.input.processFcns = {};

@@ -1,4 +1,4 @@
-maxEps = 4;
+maxEps = 40;
 
 Xp2 = X;
 Xp2(trainIdx,:) = XTrain; Xp2(testIdx,:) = XTest;

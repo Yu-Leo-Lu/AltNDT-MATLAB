@@ -1,7 +1,11 @@
 startup
 
 % load PINE data
-[PINE,trainIdx, testIdx] = loadPINE();
+% [PINE,trainIdx, testIdx] = loadPINE();
+
+% load sequential PINE data
+[PINE,trainIdx, testIdx] = loadPineTimeSeq();
+
 X = PINE.data_all.X;
 Density = PINE.data_all.t;
 
@@ -40,11 +44,11 @@ disp('-------------------- ndt SGD ends --------------------')
 % Adam saving
 disp('-------------------- ndt Adam starts --------------------')
 MaxNumSplits = 25;
-maxEps = 20;
+maxEps = 40;
 tic; ndtSGD; toc;
 disp('-------------------- ndt Adam ends --------------------')
-% names = sprintf('ndtAdam_50eps_lr1e-2_bs10000_beta1_9e-1_beta2_9e-1.mat');
-% save(fullfile(dir, 'results','testModel', names), 'ndt', 'ndtInfo',...
+% names = sprintf('ndtAdam_40eps_lr1e-2_bs10000_beta1_9e-1_beta2_9e-1.mat');
+% save(fullfile(dir, 'results','testModel','timeSeq', names), 'ndt', 'ndtInfo',...
 %      'procFcnsInput', 'settingsXTrain')
 
 
@@ -59,25 +63,25 @@ disp('-------------------- PINE SGD ends --------------------')
 %     'procFcnsInput', 'settingsXTrain')
 
 disp('-------------------- PINE Adam starts --------------------')
-maxEps = 50
+maxEps = 40;
 tic; nn45SGD; toc;
 disp('-------------------- PINE Adam ends --------------------')
 
-names = sprintf('nn45_50eps_lr1e-2_bs10000_beta1_9e-1_beta2_9e-1.mat');
-
-save(fullfile(dir, 'results', names), 'nn45', 'nn45Info',...
-    'procFcnsInput', 'settingsXTrain')
+% names = sprintf('nn45_40eps_lr1e-2_bs10000_beta1_9e-1_beta2_9e-1.mat');
+% 
+% save(fullfile(dir, 'results','timeSeq', names), 'nn45', 'nn45Info',...
+%     'procFcnsInput', 'settingsXTrain')
 
 % -------------------------LM training-------------------------------------
 % call ndtLM:
 % ndtLM
 disp('-------------------- ndt LM starts --------------------')
-MaxNumSplits = 10
+MaxNumSplits = 25;
 tic; ndtLM; toc;
 disp('-------------------- ndt LM ends --------------------')
 
-% names = sprintf('ndt10_40eps.mat');
-% save(fullfile(dir, 'results', 'trainlm', names), 'ndt', 'ndtInfo',...
+% names = sprintf('ndt25_40eps_timesep.mat');
+% save(fullfile(dir, 'results', 'trainlm','TimeSeq', names), 'ndt', 'ndtInfo',...
 %     'procFcnsInput', 'settingsXTrain')
 
 % call nn45LM
@@ -85,7 +89,7 @@ disp('-------------------- ndt LM ends --------------------')
 disp('-------------------- PINE LM starts --------------------')
 tic; nn45LM; toc;
 disp('-------------------- PINE LM ends --------------------')
-% names = sprintf('nn45_40eps_scaledStatLPolarMLT.mat');
-% save(fullfile(dir, 'results','trainlm', names), 'nn45', 'nn45Info',...
-%     'procFcnsInput', 'settingsXTrain', 'Stat')
+% names = sprintf('nn45_40eps_timesep.mat');
+% save(fullfile(dir, 'results','trainlm','TimeSeq', names), 'nn45', 'nn45Info',...
+%     'procFcnsInput', 'settingsXTrain')
 

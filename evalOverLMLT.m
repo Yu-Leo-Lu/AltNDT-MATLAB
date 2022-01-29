@@ -192,7 +192,6 @@ VisualizePredictionPlasmaSphere(nn45LM.nn45,inputLabelsGnl,xAvg30,...
 % ---------------------- load 2001 data ----------------------
 load(fullfile(dir, 'PINE_data', 'data2001'));
 load(fullfile(dir, 'PINE_data', 'data2001Hourly'));
-transition = 1.4;
                                                                          
 DateStr = '26-Jun-2001'; hr = 19; min = 33;
 days = datenum(DateStr) - datenum(2001,1,1);
@@ -202,15 +201,19 @@ xTry = [xTryGnl(1:6),nan,xTryGnl(7:end)];
 % xTryH = [xTryGnlH(1:6),nan,xTryGnlH(7:end)];
 % xTryGstack = [xTryGnl;xTryGnlH];
 
-DateStrs = {'26-Jun-2001','26-Jun-2001','26-Jun-2001','27-Jun-2001','27-Jun-2001'};
-hrs = [11,19,22,00,11]; mins = [51,33,06,09,23];
+% DateStrs = {'26-Jun-2001','26-Jun-2001','26-Jun-2001','27-Jun-2001','27-Jun-2001'};
+% hrs = [11,19,22,00,11]; mins = [51,33,06,09,23];
+% xTryGnls = NaN(5,30); xTrys = NaN(5,31);
+DateStrs = {'10-Jun-2001','28-May-2001','08-May-2001','20-Mar-2001'};
+hrs = [06,22,18,13]; mins = [33,17,24,59];
 xTryGnls = NaN(5,30); xTrys = NaN(5,31);
-for iPC = 1:5
-    DateStr = DateStrs{iPC}; hr = hrs(iPC); min = mins(iPC);
+
+for i = 1:4
+    DateStr = DateStrs{i}; hr = hrs(i); min = mins(i);
     days = datenum(DateStr) - datenum(2001,1,1);
     xTryGnl = data2001(days*24*60+hr*60+min,:);
     xTry = [xTryGnl(1:6),nan,xTryGnl(7:end)];
-    xTryGnls(iPC,:) = xTryGnl; xTrys(iPC,:) = xTry;
+    xTryGnls(i,:) = xTryGnl; xTrys(i,:) = xTry;
 end
 
 
@@ -228,20 +231,37 @@ end
 % end
 
 % ----------------- WeightLPolarMLT,StatLPolarMLT, polarMLT, PINE -----------------
-figure; 
-for iPC = 1:5
-    timeTitle=[DateStrs{iPC},' ',num2str(hrs(iPC),'%02.f'),':', num2str(mins(iPC),'%02.f')];
-    subplot(4,5,iPC);
-    VisualizePredictionPlasmaSphereByWeights(ndtStatWeight1LPolarLM.ndt,inputLabels,xTrys(iPC,:),...
+figure; % 5 plots per method
+for i = 1:5
+    timeTitle=[DateStrs{i},' ',num2str(hrs(i),'%02.f'),':', num2str(mins(i),'%02.f')];
+    subplot(4,5,i);
+    VisualizePredictionPlasmaSphereByWeights(ndtStatWeight1LPolarLM.ndt,inputLabels,xTrys(i,:),...
         12,72,ndtStatWeight1LPolarLM.procFcnsInput,ndtStatWeight1LPolarLM.settingsXTrain,ndtStatWeight1LPolarLM.Stat,timeTitle,[],0)
-    subplot(4,5,iPC+5);
-    VisualizePredictionPlasmaSphere(ndtStatLPolarLM.ndt,inputLabels,xTrys(iPC,:),...
+    subplot(4,5,i+5);
+    VisualizePredictionPlasmaSphere(ndtStatLPolarLM.ndt,inputLabels,xTrys(i,:),...
         12,72,ndtStatLPolarLM.procFcnsInput,ndtStatLPolarLM.settingsXTrain,ndtStatLPolarLM.Stat,'',[],0)
-    subplot(4,5,iPC+5*2);
-    VisualizePredictionPlasmaSphere(ndtPolarLM.ndt,inputLabels,xTrys(iPC,:),...
+    subplot(4,5,i+5*2);
+    VisualizePredictionPlasmaSphere(ndtPolarLM.ndt,inputLabels,xTrys(i,:),...
         12,72,ndtPolarLM.procFcnsInput,ndtPolarLM.settingsXTrain,[],'',[],0)
-    subplot(4,5,iPC+5*3);
-    VisualizePredictionPlasmaSphere(nn45LM.nn45,inputLabelsGnl,xTryGnls(iPC,:),...
+    subplot(4,5,i+5*3);
+    VisualizePredictionPlasmaSphere(nn45LM.nn45,inputLabelsGnl,xTryGnls(i,:),...
+        12,72,nn45LM.procFcnsInput,nn45LM.settingsXTrain,[],'',[],0)
+end
+% ----------------- WeightLPolarMLT,StatLPolarMLT, polarMLT, PINE -----------------
+figure; % 4 plots per method
+for i = 1:4
+    timeTitle=[DateStrs{i},' ',num2str(hrs(i),'%02.f'),':', num2str(mins(i),'%02.f')];
+    subplot(4,4,i);
+    VisualizePredictionPlasmaSphereByWeights(ndtStatWeight1LPolarLM.ndt,inputLabels,xTrys(i,:),...
+        12,72,ndtStatWeight1LPolarLM.procFcnsInput,ndtStatWeight1LPolarLM.settingsXTrain,ndtStatWeight1LPolarLM.Stat,timeTitle,[],0)
+    subplot(4,4,i+4);
+    VisualizePredictionPlasmaSphere(ndtStatLPolarLM.ndt,inputLabels,xTrys(i,:),...
+        12,72,ndtStatLPolarLM.procFcnsInput,ndtStatLPolarLM.settingsXTrain,ndtStatLPolarLM.Stat,'',[],0)
+    subplot(4,4,i+4*2);
+    VisualizePredictionPlasmaSphere(ndtPolarLM.ndt,inputLabels,xTrys(i,:),...
+        12,72,ndtPolarLM.procFcnsInput,ndtPolarLM.settingsXTrain,[],'',[],0)
+    subplot(4,4,i+4*3);
+    VisualizePredictionPlasmaSphere(nn45LM.nn45,inputLabelsGnl,xTryGnls(i,:),...
         12,72,nn45LM.procFcnsInput,nn45LM.settingsXTrain,[],'',[],0)
 end
 
