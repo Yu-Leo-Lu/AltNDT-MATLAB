@@ -34,16 +34,17 @@ end
 
 figure
 hold on
-plot(epsNdt, TrainRmseNDTSgdEps,'--','Color','#D95319') %default color2
-plot(epsNdt, TestRmseNDTSgdEps,'.-','MarkerSize',10,'Color','#D95319')
-plot(epsNN45, TrainRmseNN45SgdEps,'--','Color','#EDB120') %default color3
-plot(epsNN45, TestRmseNN45SgdEps,'.-','MarkerSize',10,'Color','#EDB120')
+plot(epsNdt, TrainRmseNDTSgdEps,'--','Color','#D95319','LineWidth',2) %default color2
+plot(epsNdt, TestRmseNDTSgdEps,'.-','MarkerSize',20,'Color','#D95319','LineWidth',2)
+plot(epsNN45, TrainRmseNN45SgdEps,'--','Color','#0072BD','LineWidth',2) %default color1
+plot(epsNN45, TestRmseNN45SgdEps,'.-','MarkerSize',20,'Color','#0072BD','LineWidth',2)
 
 legend({['NDT',methodStr, ', training'],['NDT',methodStr,', testing'],...
     ['PINE',methodStr,', training'],['PINE',methodStr,', testing']}, 'location', 'northeast', 'NumColumns',2)
-xlabel('Epochs')
-ylabel('RMSE')
-title('Performance Comparison in RMSE')
+xlabel('Epochs', 'FontSize',12)
+ylabel('RMSE', 'FontSize', 12)
+
+title('Performance Comparison in RMSE','FontSize',18)
 
 
 end

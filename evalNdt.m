@@ -13,9 +13,6 @@ ndtAdam = load(fullfile(dir,'results','testModel', 'ndtAdam_50eps_lr1e-2_bs10000
 nn45SGD = load(fullfile(dir,'results', 'nn45_200eps_lr1e-1_bs10000_mmt1e-1_tnoproc'));
 nn45Adam = load(fullfile(dir,'results','testModel', 'nn45Adam_50eps_lr1e-2_bs10000_beta1_9e-1_beta2_9e-1'));
 
-ndt_timeseq = load(fullfile(dir,'results','trainlm','TimeSeq','ndt25_40eps'));
-nn45_timeseq = load(fullfile(dir,'results','trainlm','TimeSeq', 'nn45_40eps'));
-
 %---------------------- RMSE plot convergence SGD ----------------------
 rmsePlotSGD(ndtSGD, nn45SGD, 293,1:40, 'SGD')
 rmsePlotSGD(ndtAdam, nn45Adam, 293, 1:40, 'Adam')
@@ -133,9 +130,6 @@ length(getwb(ndt15.ndt))
 rmsePlot(ndt10, nn45, 'NDT10')
 length(getwb(ndt10.ndt))
 length(getwb(nn45.nn45))
-
-% RMSE plot time sequential
-rmsePlot(ndt_timeseq, nn45_timeseq, 'NDT TimeSeq')
 
 % ---------------------- old plot ----------------------
 figure(4)
